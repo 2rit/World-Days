@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="th" data-t="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f7fb">
+<title>World Days — วันสำคัญทั่วโลก</title>
+<script>
+(function(){try{var t=localStorage.getItem('wd-theme');
+if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+document.documentElement.setAttribute('data-t',t);
+var m=document.querySelector('meta[name=theme-color]');if(m)m.content=t==='dark'?'#0c0d12':'#f6f7fb';}catch(e){}})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ Design tokens ============ */
+:root{
+  color-scheme:light;
+  --bg:#f6f7fb; --glass:rgba(246,247,251,.82); --card:#ffffff; --fg:#161a23; --mut:#6a7180;
+  --line:#e6e8ef; --soft:#f1f3f8;
+  --acc:#4f46e5; --acc-soft:rgba(79,70,229,.09); --acc-fg:#fff;
+  --warn:#b45309; --warn-bg:rgba(245,158,11,.13);
+  --nat:#3b82f6; --int:#10b981; --rel:#a855f7; --cul:#f59e0b; --obs:#ef4444;
+  --r:16px;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 4px 16px rgba(16,24,40,.05);
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+[data-t="dark"]{
+  color-scheme:dark;
+  --bg:#0c0d12; --glass:rgba(12,13,18,.82); --card:#14161d; --fg:#eceef3; --mut:#9097a7;
+  --line:#242732; --soft:#1b1e27;
+  --acc:#8b8dff; --acc-soft:rgba(139,141,255,.14); --acc-fg:#0c0d12;
+  --warn:#f5b74a; --warn-bg:rgba(245,158,11,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 4px 16px rgba(0,0,0,.25);
+}
+
+/* ============ Base ============ */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);
+  font-family:'Inter','Noto Sans Thai',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+html.tt *{transition:background-color .3s,color .3s,border-color .3s!important}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:inherit}
+button:disabled{cursor:default}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:8px}
+.ih:focus-visible,.mhead:focus-visible{outline-offset:-2px}
+mark{background:rgba(245,158,11,.3);color:inherit;border-radius:3px;padding:0 1px}
+.wrap{max-width:760px;margin:0 auto;padding:0 max(18px,env(safe-area-inset-left)) calc(80px + env(safe-area-inset-bottom))}
+
+/* ============ Header ============ */
+header{position:sticky;top:0;z-index:30;background:var(--glass);
+  -webkit-backdrop-filter:saturate(1.5) blur(16px);backdrop-filter:saturate(1.5) blur(16px);
+  border-bottom:1px solid transparent;transition:border-color .2s;padding-top:env(safe-area-inset-top)}
+header.scrolled{border-bottom-color:var(--line)}
+.hbar{max-width:760px;margin:0 auto;padding:10px 18px;min-height:60px;display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:11px;margin-right:auto;min-width:0}
+.logo{width:36px;height:36px;border-radius:11px;flex:none;display:grid;place-items:center;font-size:19px;
+  background:linear-gradient(135deg,var(--acc),#7c3aed);box-shadow:0 4px 12px rgba(79,70,229,.28)}
+.bt{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.bt b{font-size:15.5px;font-weight:700;letter-spacing:-.2px}
+.bt small{font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sw{display:flex;gap:2px;padding:3px;background:var(--soft);border:1px solid var(--line);border-radius:12px}
+.sw button{padding:5px 12px;border-radius:9px;font-size:13px;font-weight:500;color:var(--mut);transition:background .2s,color .2s}
+.sw button.on{background:var(--acc);color:var(--acc-fg)}
+.ico{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--card);
+  display:grid;place-items:center;color:var(--fg);transition:background .15s}
+.i-sun{display:none}
+[data-t="dark"] .i-sun{display:block}
+[data-t="dark"] .i-moon{display:none}
+
+/* ============ Today hero ============ */
+.hero{padding:30px 4px 0}
+.hero .dt{font-size:13px;font-weight:600;color:var(--acc);letter-spacing:.3px}
+.hero h1{font-size:clamp(26px,6.5vw,36px);font-weight:700;letter-spacing:-.6px;line-height:1.25;margin-top:4px}
+.sec{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:22px 4px 10px}
+.sec h2{font-size:13px;font-weight:600;color:var(--mut);letter-spacing:.2px}
+.sec .cnt{font-size:12px;color:var(--mut)}
+
+/* ============ Card & items ============ */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.it{position:relative}
+.it+.it{border-top:1px solid var(--line)}
+.it::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cc,var(--acc));
+  opacity:0;transition:opacity .25s}
+.it.open::before{opacity:1}
+.ih{width:100%;display:flex;align-items:center;gap:14px;padding:14px 16px;transition:background .15s}
+.it.open>.ih{background:var(--soft)}
+.fl{width:42px;height:42px;border-radius:13px;background:var(--soft);display:grid;place-items:center;font-size:23px;line-height:1;flex:none}
+.it.open .fl{background:var(--card)}
+.ic{flex:1;min-width:0}
+.ic b{display:block;font-weight:600;font-size:15.5px;letter-spacing:-.1px;line-height:1.4}
+.ic small{display:flex;align-items:center;gap:6px;margin-top:2px;font-size:12.5px;color:var(--mut)}
+.ic small .sep{opacity:.5}
+.cdot{width:7px;height:7px;border-radius:50%;background:var(--cc,var(--acc));display:inline-block;flex:none}
+.chev{display:grid;place-items:center;color:var(--mut);flex:none;transition:transform .28s var(--ease)}
+.open>.ih .chev,.open>.mhead .chev,.open>.bh .chev{transform:rotate(90deg)}
+
+/* smooth collapse (used by items, month groups, panels, sources) */
+.col{display:grid;grid-template-rows:0fr;visibility:hidden;transition:grid-template-rows .3s var(--ease),visibility 0s linear .3s}
+.open>.col,.show>.col{grid-template-rows:1fr;visibility:visible;transition-delay:0s}
+.col>.ci{overflow:hidden;min-height:0}
+
+.ibc{padding:2px 18px 20px 72px}
+.ibc p{font-size:14.5px;line-height:1.8;opacity:.9}
+.mt{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.mt span{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--mut);background:var(--soft);
+  border:1px solid var(--line);padding:3px 10px;border-radius:999px}
+.it.open .mt span{background:var(--card)}
+.ax{display:flex;align-items:flex-start;gap:7px;margin-top:12px;padding:8px 12px;border-radius:10px;
+  background:var(--warn-bg);color:var(--warn);font-size:12.5px;line-height:1.55}
+.ax svg{flex:none;margin-top:3px}
+.ref{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+.ref b{font-size:11.5px;color:var(--mut);font-weight:500}
+.ref a{font-size:12.5px;color:var(--acc);text-decoration:none;font-weight:500}
+.ref a::after{content:"↗";font-size:10px;opacity:.6;margin-left:3px}
+
+/* ============ Toolbar ============ */
+.tb{display:flex;align-items:center;gap:8px;margin-top:26px}
+.mnav{display:flex;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);min-width:0}
+.nav{width:40px;height:42px;display:grid;place-items:center;color:var(--mut);border-radius:12px;transition:background .15s,color .15s;flex:none}
+.mpick{height:42px;padding:0 6px;display:flex;align-items:center;gap:6px;font-weight:600;font-size:15px;letter-spacing:-.2px;
+  border-radius:12px;white-space:nowrap;min-width:0}
+.mpick svg{color:var(--mut);transition:transform .25s var(--ease)}
+.mpick[aria-expanded="true"] svg{transform:rotate(180deg)}
+.tbtn{height:44px;padding:0 13px;display:flex;align-items:center;gap:7px;border-radius:13px;font-size:13.5px;font-weight:500;color:var(--mut);
+  background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);transition:all .15s;flex:none}
+#bfilter{margin-left:auto}
+.tbtn.on,.tbtn[aria-expanded="true"]{color:var(--acc);border-color:var(--acc);background:var(--acc-soft)}
+.tbtn:disabled{opacity:.4;box-shadow:none}
+.bdg{min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--acc);color:var(--acc-fg);font-size:11px;font-weight:700;display:grid;place-items:center;line-height:1}
+@media(max-width:500px){.tbtn .lbl{display:none}.tbtn{padding:0 12px}}
+
+/* ============ Panels ============ */
+.panel{margin-top:0;transition:margin .3s var(--ease)}
+.panel.show{margin-top:10px}
+.pc{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.plabel{font-size:12px;font-weight:600;color:var(--mut);margin:16px 0 8px;letter-spacing:.2px}
+.pc>.plabel:first-child{margin-top:0}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.grid7{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.grid4 button,.grid7 button{height:42px;border:1px solid var(--line);border-radius:11px;font-size:13.5px;font-weight:500;color:var(--mut);
+  display:grid;place-items:center;transition:all .15s;position:relative}
+.grid7 button{font-size:12.5px}
+.grid4 button.cur{color:var(--fg);font-weight:600}
+.grid4 button.cur::after{content:"";position:absolute;bottom:5px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.6}
+.grid4 button.on,.grid7 button.on{background:var(--acc);color:var(--acc-fg);border-color:var(--acc)}
+
+input,select{font-family:inherit;font-size:16px;color:var(--fg);background-color:var(--bg);border:1px solid var(--line);
+  border-radius:12px;height:46px;padding:0 14px;outline:none;width:100%;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft)}
+select{appearance:none;-webkit-appearance:none;padding-right:38px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239097a7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center}
+.sf{position:relative}
+.sf>svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--mut);pointer-events:none}
+.sf input{padding-left:42px;padding-right:42px}
+.sf .x{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:36px;height:36px;display:grid;place-items:center;color:var(--mut);border-radius:50%}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chips button{height:36px;padding:0 14px;border:1px solid var(--line);border-radius:999px;font-size:13px;font-weight:500;color:var(--mut);
+  display:flex;align-items:center;gap:7px;transition:all .15s}
+.chips button.on{background:var(--acc);color:var(--acc-fg);border-color:var(--acc)}
+.chips .cd{width:7px;height:7px;border-radius:50%}
+
+/* calendar */
+.cwk,.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cwk div{text-align:center;font-size:11.5px;font-weight:600;color:var(--mut);padding-bottom:8px}
+.cal button{height:46px;border-radius:12px;font-size:13.5px;color:var(--mut);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;transition:background .15s}
+.cal button:disabled{opacity:.4}
+.cal button.has{color:var(--fg);font-weight:600;background:var(--soft)}
+.cal button.now{background:var(--acc);color:var(--acc-fg);opacity:1}
+.cal .ds{display:flex;gap:3px;height:4px}
+.cal .ds i{width:4px;height:4px;border-radius:50%;display:block}
+
+/* ============ Summary row ============ */
+.sum{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:16px 4px 0;font-size:12.5px;color:var(--mut)}
+.fchip{display:inline-flex;align-items:center;gap:2px;padding:2px 3px 2px 11px;border-radius:999px;background:var(--acc-soft);color:var(--acc);font-size:12.5px;font-weight:500}
+.fchip button{width:24px;height:24px;display:grid;place-items:center;border-radius:50%}
+.sum .clr{margin-left:auto;color:var(--acc);font-size:12.5px;font-weight:500;padding:4px 2px}
+
+/* ============ Day groups ============ */
+.day{margin-top:6px}
+.dayhd{display:flex;align-items:baseline;gap:8px;padding:8px 10px;margin:14px -6px 4px;border-radius:10px;scroll-margin-top:84px}
+.dayhd b{font-size:15px;font-weight:700}
+.dayhd span{font-size:13px;color:var(--mut)}
+.pill{font-style:normal;font-size:11px;font-weight:600;color:var(--acc);background:var(--acc-soft);padding:2px 10px;border-radius:99px;align-self:center}
+.dayhd.flash{animation:flash 1.8s var(--ease)}
+@keyframes flash{0%,35%{background:var(--acc-soft)}100%{background:transparent}}
+
+.mgw{margin-top:10px}
+.mhead{width:100%;display:flex;align-items:center;gap:10px;padding:15px 16px;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;box-shadow:var(--shadow)}
+.mhead b{font-size:15.5px;font-weight:600}
+.mhead .n{margin-left:auto;font-size:12.5px;color:var(--mut)}
+.mgw.open>.mhead{border-bottom-left-radius:14px}
+
+.empty{text-align:center;color:var(--mut);font-size:14px;padding:44px 20px}
+.empty .eico{display:block;font-size:32px;margin-bottom:8px}
+.empty button{margin-top:16px;height:40px;padding:0 18px;border-radius:12px;background:var(--acc);color:var(--acc-fg);font-weight:600;font-size:13.5px}
+
+/* ============ Sources & footer ============ */
+.blk{margin-top:44px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.bh{width:100%;display:flex;align-items:center;gap:10px;padding:16px}
+.bh .t{font-weight:600;font-size:14.5px}
+.bh .s{margin-left:auto;font-size:12.5px;color:var(--mut)}
+.srcs{padding:0 16px 18px;border-top:1px solid var(--line);padding-top:12px}
+.srcs a{display:block;padding:7px 0;font-size:13.5px;color:var(--acc);text-decoration:none;font-weight:500}
+.srcs small{display:block;margin-top:8px;font-size:12px;color:var(--mut);line-height:1.7}
+footer{margin-top:36px;padding:0 4px;font-size:12px;color:var(--mut);line-height:1.8;text-align:center}
+
+.top{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));width:46px;height:46px;border-radius:50%;
+  background:var(--fg);color:var(--bg);display:grid;place-items:center;box-shadow:0 6px 20px rgba(0,0,0,.25);
+  opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .25s,transform .25s var(--ease);z-index:25}
+.top.show{opacity:1;transform:none;pointer-events:auto}
+
+/* ============ Interaction & responsive ============ */
+@media(hover:hover){
+  .ico:hover,.nav:hover,.mpick:hover,.ih:hover,.cal button.has:hover,.grid4 button:hover,.grid7 button:hover,.chips button:hover,.tbtn:hover{background:var(--soft)}
+  .grid4 button.on:hover,.grid7 button.on:hover,.chips button.on:hover{background:var(--acc)}
+  .tbtn.on:hover,.tbtn[aria-expanded="true"]:hover{background:var(--acc-soft)}
+  .mhead:hover{background:var(--soft)}
+  .ref a:hover{text-decoration:underline}
+  .srcs a:hover{text-decoration:underline}
+  .sw button:not(.on):hover{color:var(--fg)}
+  .cal button.now:hover{background:var(--acc)}
+}
+@media(pointer:coarse){.ico{width:44px;height:44px}.sw button{padding:8px 14px}}
+@media(max-width:520px){
+  .ibc{padding:2px 16px 18px 16px}
+  .fl{width:40px;height:40px;font-size:22px}
+  .ih{gap:12px;padding:13px 14px}
+  .cal button{height:42px}
+}
+@media(max-width:380px){.bt small{display:none}.grid7 button{font-size:11.5px}}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+
+<header id="hdr"><div class="hbar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">🌍</span>
+    <span class="bt"><b>World Days</b><small id="bsub">วันสำคัญทั่วโลก</small></span>
+  </div>
+  <div class="sw" id="lang" role="group" aria-label="Language"><button data-l="th" class="on">ไทย</button><button data-l="en">EN</button></div>
+  <button class="ico" id="theme" aria-label="Theme">
+    <svg class="i-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    <svg class="i-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  </button>
+</div></header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="dt" id="tdate">—</div>
+    <h1 id="ttitle">—</h1>
+  </section>
+  <div class="sec"><h2 id="tlab"></h2><span class="cnt" id="tcnt"></span></div>
+  <div class="card" id="tlist"></div>
+
+  <nav class="tb">
+    <div class="mnav">
+      <button class="nav" id="prev" aria-label="Previous"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+      <button class="mpick" id="mpick" aria-expanded="false" aria-controls="pmonth"></button>
+      <button class="nav" id="next" aria-label="Next"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+    </div>
+    <button class="tbtn" id="bfilter" aria-expanded="false" aria-controls="pfilter"></button>
+    <button class="tbtn" id="bcal" aria-expanded="false" aria-controls="pcal"></button>
+  </nav>
+
+  <div class="panel" id="pmonth"><div class="col"><div class="ci"><div class="pc">
+    <div class="grid4" id="mgrid"></div>
+    <div class="plabel" id="ylab"></div>
+    <div class="grid7" id="ygrid"></div>
+  </div></div></div></div>
+
+  <div class="panel" id="pfilter"><div class="col"><div class="ci"><div class="pc">
+    <div class="sf">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="text" inputmode="search" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button class="x" id="qx" aria-label="Clear" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="plabel" id="colab"></div>
+    <select id="country"></select>
+    <div class="plabel" id="clab"></div>
+    <div class="chips" id="cats"></div>
+  </div></div></div></div>
+
+  <div class="panel" id="pcal"><div class="col"><div class="ci"><div class="pc">
+    <div class="cwk" id="cwk"></div>
+    <div class="cal" id="cal"></div>
+  </div></div></div></div>
+
+  <div class="sum" id="sum"></div>
+  <div id="main"></div>
+
+  <div class="blk" id="srcblk">
+    <button class="bh" data-blk aria-expanded="false"><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span><span class="t" id="slab"></span><span class="s" id="scnt"></span></button>
+    <div class="col"><div class="ci"><div class="srcs" id="srclist"></div></div></div>
+  </div>
+
+  <footer id="foot"></footer>
+</main>
+
+<button class="top" id="totop" aria-label="Top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button>
+
+<script>
+/* ============ 1) ประเทศ ============ */
+const CT={
+ INT:["สากล / ทั่วโลก","Worldwide","🌍"],UN:["สหประชาชาติ","United Nations","🇺🇳"],
+ TH:["ไทย","Thailand","🇹🇭"],JP:["ญี่ปุ่น","Japan","🇯🇵"],CN:["จีน","China","🇨🇳"],
+ KR:["เกาหลีใต้","South Korea","🇰🇷"],IN:["อินเดีย","India","🇮🇳"],US:["สหรัฐอเมริกา","United States","🇺🇸"],
+ GB:["สหราชอาณาจักร","United Kingdom","🇬🇧"],FR:["ฝรั่งเศส","France","🇫🇷"],DE:["เยอรมนี","Germany","🇩🇪"],
+ IT:["อิตาลี","Italy","🇮🇹"],ES:["สเปน","Spain","🇪🇸"],RU:["รัสเซีย","Russia","🇷🇺"],
+ UA:["ยูเครน","Ukraine","🇺🇦"],PL:["โปแลนด์","Poland","🇵🇱"],NL:["เนเธอร์แลนด์","Netherlands","🇳🇱"],
+ BE:["เบลเยียม","Belgium","🇧🇪"],CH:["สวิตเซอร์แลนด์","Switzerland","🇨🇭"],AT:["ออสเตรีย","Austria","🇦🇹"],
+ SE:["สวีเดน","Sweden","🇸🇪"],NO:["นอร์เวย์","Norway","🇳🇴"],FI:["ฟินแลนด์","Finland","🇫🇮"],
+ IE:["ไอร์แลนด์","Ireland","🇮🇪"],GR:["กรีซ","Greece","🇬🇷"],RO:["โรมาเนีย","Romania","🇷🇴"],
+ EE:["เอสโตเนีย","Estonia","🇪🇪"],LU:["ลักเซมเบิร์ก","Luxembourg","🇱🇺"],
+ CA:["แคนาดา","Canada","🇨🇦"],MX:["เม็กซิโก","Mexico","🇲🇽"],BR:["บราซิล","Brazil","🇧🇷"],
+ AR:["อาร์เจนตินา","Argentina","🇦🇷"],CL:["ชิลี","Chile","🇨🇱"],CO:["โคลอมเบีย","Colombia","🇨🇴"],
+ PE:["เปรู","Peru","🇵🇪"],VE:["เวเนซุเอลา","Venezuela","🇻🇪"],CU:["คิวบา","Cuba","🇨🇺"],
+ HT:["เฮติ","Haiti","🇭🇹"],DO:["สาธารณรัฐโดมินิกัน","Dominican Republic","🇩🇴"],GT:["กัวเตมาลา","Guatemala","🇬🇹"],
+ AU:["ออสเตรเลีย","Australia","🇦🇺"],NZ:["นิวซีแลนด์","New Zealand","🇳🇿"],
+ VN:["เวียดนาม","Vietnam","🇻🇳"],LA:["ลาว","Laos","🇱🇦"],KH:["กัมพูชา","Cambodia","🇰🇭"],
+ MM:["เมียนมา","Myanmar","🇲🇲"],MY:["มาเลเซีย","Malaysia","🇲🇾"],SG:["สิงคโปร์","Singapore","🇸🇬"],
+ ID:["อินโดนีเซีย","Indonesia","🇮🇩"],PH:["ฟิลิปปินส์","Philippines","🇵🇭"],BN:["บรูไน","Brunei","🇧🇳"],
+ TW:["ไต้หวัน","Taiwan","🇹🇼"],HK:["ฮ่องกง","Hong Kong","🇭🇰"],BD:["บังกลาเทศ","Bangladesh","🇧🇩"],
+ PK:["ปากีสถาน","Pakistan","🇵🇰"],IR:["อิหร่าน","Iran","🇮🇷"],TR:["ตุรเคีย","Türkiye","🇹🇷"],
+ SA:["ซาอุดีอาระเบีย","Saudi Arabia","🇸🇦"],AE:["สหรัฐอาหรับเอมิเรตส์","United Arab Emirates","🇦🇪"],
+ QA:["กาตาร์","Qatar","🇶🇦"],KW:["คูเวต","Kuwait","🇰🇼"],EG:["อียิปต์","Egypt","🇪🇬"],
+ ZA:["แอฟริกาใต้","South Africa","🇿🇦"],NG:["ไนจีเรีย","Nigeria","🇳🇬"],KE:["เคนยา","Kenya","🇰🇪"],
+ RW:["รวันดา","Rwanda","🇷🇼"],SCT:["สกอตแลนด์","Scotland","🏴󠁧󠁢󠁳󠁣󠁴󠁿"],WLS:["เวลส์","Wales","🏴󠁧󠁢󠁷󠁬󠁳󠁿"],
+ EU:["ยุโรป","Europe","🇪🇺"],ARAB:["โลกมุสลิม","Muslim World","🕌"]
+};
+
+/* ============ 2) ข้อมูลวันสำคัญ ============ */
+const E=(m,d,c,th,en,dth,den,cat)=>({m,d,c,th,en,dth,den,cat});
+const MV=(f,c,th,en,dth,den,cat,ax)=>({f,c,th,en,dth,den,cat,ax:!!ax});
+
+const FIXED=[
+E(1,1,"INT","วันขึ้นปีใหม่","New Year's Day","วันแรกของปฏิทินเกรโกเรียน เป็นวันหยุดราชการในเกือบทุกประเทศทั่วโลก ผู้คนนิยมนับถอยหลังและตั้งปณิธานปีใหม่","First day of the Gregorian calendar and a public holiday in almost every country, marked with countdowns and resolutions.","international"),
+E(1,1,"HT","วันเอกราชเฮติ","Haitian Independence Day","ค.ศ. 1804 เฮติประกาศเอกราชจากฝรั่งเศส กลายเป็นสาธารณรัฐคนผิวดำแห่งแรกของโลก และเป็นชาติเดียวที่เกิดจากการปฏิวัติของทาสที่สำเร็จ","In 1804 Haiti declared independence from France, becoming the world's first Black republic and the only nation born of a successful slave revolt.","national"),
+E(1,1,"CU","วันแห่งชัยชนะของการปฏิวัติ","Triumph of the Revolution","วันหยุดประจำชาติของคิวบา ระลึกถึงชัยชนะของการปฏิวัติคิวบาในปี ค.ศ. 1959","Cuban national holiday marking the victory of the Cuban Revolution in 1959.","national"),
+E(1,6,"ES","วันสมโภชพระคริสต์แสดงองค์","Epiphany / Three Kings' Day","ระลึกถึงโหราจารย์สามคนที่เดินทางมาเยี่ยมพระกุมาร ในสเปนและลาตินอเมริกาเด็ก ๆ จะได้รับของขวัญในวันนี้แทนวันคริสต์มาส","Christian feast of the Magi's visit. In Spain and Latin America children receive gifts today rather than at Christmas.","religious"),
+E(1,7,"RU","วันคริสต์มาสออร์ทอดอกซ์","Orthodox Christmas","คริสตจักรออร์ทอดอกซ์ที่ใช้ปฏิทินจูเลียนฉลองวันประสูติของพระเยซูในวันนี้ เช่น รัสเซีย เซอร์เบีย จอร์เจีย","Orthodox churches following the Julian calendar — Russia, Serbia, Georgia — celebrate the Nativity today.","religious"),
+E(1,16,"TH","วันครู","National Teachers' Day","ประเทศไทยกำหนดให้เป็นวันระลึกพระคุณครู มีพิธีไหว้ครูและมอบรางวัลครูดีเด่นทั่วประเทศ","Thailand's day to honour teachers, with ceremonies of respect and awards for outstanding educators.","national"),
+E(1,17,"TH","วันพ่อขุนรามคำแหงมหาราช","King Ramkhamhaeng Day","ระลึกถึงพ่อขุนรามคำแหงมหาราชแห่งกรุงสุโขทัย ผู้ประดิษฐ์อักษรไทยเมื่อ พ.ศ. 1826","Commemorates King Ramkhamhaeng of Sukhothai, credited with creating the Thai alphabet in 1283.","national"),
+E(1,26,"IN","วันสาธารณรัฐอินเดีย","Republic Day","ค.ศ. 1950 รัฐธรรมนูญอินเดียมีผลบังคับใช้ มีขบวนพาเหรดใหญ่ในกรุงนิวเดลี","The Constitution of India came into force in 1950, marked by the grand parade in New Delhi.","national"),
+E(1,26,"AU","วันชาติออสเตรเลีย","Australia Day","ระลึกถึงการขึ้นฝั่งของกองเรือชุดแรกที่ซิดนีย์โคฟในปี ค.ศ. 1788 ชาวอะบอริจินบางส่วนเรียกวันนี้ว่า Invasion Day","Marks the 1788 arrival of the First Fleet at Sydney Cove. Many Aboriginal Australians observe it as Invasion Day.","national"),
+E(1,27,"UN","วันรำลึกฮอโลคอสต์สากล","International Holocaust Remembrance Day","สหประชาชาติกำหนดให้ระลึกถึงเหยื่อฮอโลคอสต์ ตรงกับวันปลดปล่อยค่ายเอาช์วิทซ์-เบียร์เคเนา ค.ศ. 1945","UN day remembering Holocaust victims, on the anniversary of the 1945 liberation of Auschwitz-Birkenau.","international"),
+E(2,2,"UN","วันพื้นที่ชุ่มน้ำโลก","World Wetlands Day","ระลึกถึงการลงนามอนุสัญญาแรมซาร์ ค.ศ. 1971 เพื่ออนุรักษ์พื้นที่ชุ่มน้ำที่เป็นระบบนิเวศสำคัญ","Marks the 1971 signing of the Ramsar Convention on the conservation of wetlands.","international"),
+E(2,4,"UN","วันมะเร็งโลก","World Cancer Day","รณรงค์สร้างความตระหนักเรื่องการป้องกัน การตรวจพบแต่เนิ่น ๆ และการรักษาโรคมะเร็ง","Global campaign on cancer prevention, early detection and treatment.","observance"),
+E(2,6,"NZ","วันไวตังกิ","Waitangi Day","วันชาตินิวซีแลนด์ ระลึกถึงการลงนามสนธิสัญญาไวตังกิระหว่างราชวงศ์อังกฤษกับหัวหน้าชาวเมารีในปี ค.ศ. 1840","New Zealand's national day, marking the 1840 signing of the Treaty of Waitangi between the Crown and Māori chiefs.","national"),
+E(2,11,"JP","วันสถาปนาประเทศ","National Foundation Day","ระลึกถึงการขึ้นครองราชย์ของจักรพรรดิจิมมุ จักรพรรดิองค์แรกตามตำนานญี่ปุ่น","Commemorates the mythical accession of Emperor Jimmu, Japan's first emperor.","national"),
+E(2,11,"UN","วันสตรีและเด็กหญิงในวงการวิทยาศาสตร์","Women and Girls in Science Day","ส่งเสริมให้ผู้หญิงและเด็กหญิงเข้าถึงและมีบทบาทเท่าเทียมในสายวิทยาศาสตร์","Promotes full and equal access for women and girls in science.","international"),
+E(2,12,"MM","วันสหภาพ","Union Day","ระลึกถึงข้อตกลงปางหลวง ค.ศ. 1947 ที่รวมกลุ่มชาติพันธุ์เข้าเป็นสหภาพเมียนมา","Marks the 1947 Panglong Agreement that united Myanmar's ethnic groups.","national"),
+E(2,13,"UN","วันวิทยุโลก","World Radio Day","ยูเนสโกยกย่องวิทยุในฐานะสื่อที่เข้าถึงผู้คนได้กว้างที่สุดและมีต้นทุนต่ำที่สุด","UNESCO day celebrating radio as the world's most widely accessible medium.","international"),
+E(2,14,"INT","วันวาเลนไทน์","Valentine's Day","วันแห่งความรัก มีที่มาจากนักบุญวาเลนไทน์ นิยมมอบดอกไม้ ช็อกโกแลต และการ์ดให้คนรัก","Day of romantic love named after Saint Valentine, with flowers, chocolates and cards.","cultural"),
+E(2,20,"UN","วันความยุติธรรมทางสังคมโลก","World Day of Social Justice","รณรงค์ขจัดความยากจน การกีดกัน และความเหลื่อมล้ำในสังคม","Campaign against poverty, exclusion and inequality.","international"),
+E(2,21,"UN","วันภาษาแม่สากล","International Mother Language Day","ยูเนสโกกำหนดเพื่อส่งเสริมความหลากหลายทางภาษา มีที่มาจากขบวนการภาษาเบงกาลีปี ค.ศ. 1952","UNESCO day promoting linguistic diversity, rooted in the 1952 Bengali Language Movement.","international"),
+E(2,23,"JP","วันคล้ายวันพระราชสมภพจักรพรรดิ","Emperor's Birthday","วันคล้ายวันพระราชสมภพของสมเด็จพระจักรพรรดินารุฮิโตะ เป็นวันหยุดราชการของญี่ปุ่น","The birthday of Emperor Naruhito, a Japanese public holiday.","national"),
+E(2,23,"BN","วันชาติบรูไน","Brunei National Day","ค.ศ. 1984 บรูไนได้รับเอกราชสมบูรณ์จากสหราชอาณาจักร","Brunei gained full independence from the United Kingdom in 1984.","national"),
+E(2,24,"EE","วันเอกราชเอสโตเนีย","Estonian Independence Day","ค.ศ. 1918 เอสโตเนียประกาศเอกราชจากจักรวรรดิรัสเซีย","Estonia declared independence from the Russian Empire in 1918.","national"),
+E(2,25,"KW","วันชาติคูเวต","Kuwait National Day","ระลึกถึงการขึ้นครองราชย์ของเจ้าผู้ครองรัฐ และเอกราชจากอังกฤษในปี ค.ศ. 1961","Marks Kuwait's 1961 independence from Britain and the accession of its ruler.","national"),
+E(2,27,"DO","วันเอกราชโดมินิกัน","Dominican Independence Day","ค.ศ. 1844 สาธารณรัฐโดมินิกันประกาศเอกราชจากเฮติ","The Dominican Republic declared independence from Haiti in 1844.","national"),
+E(3,1,"WLS","วันนักบุญเดวิด","St David's Day","วันชาติเวลส์ ระลึกถึงนักบุญเดวิด นักบุญองค์อุปถัมภ์ ผู้คนนิยมติดดอกแดฟโฟดิลและต้นหอม","Wales's national day honouring Saint David; people wear daffodils and leeks.","cultural"),
+E(3,3,"UN","วันสัตว์ป่าและพืชป่าโลก","World Wildlife Day","ระลึกถึงการลงนามอนุสัญญา CITES ค.ศ. 1973 เพื่อปกป้องสัตว์ป่าและพืชป่าใกล้สูญพันธุ์","Marks the 1973 signing of CITES, protecting endangered wild fauna and flora.","international"),
+E(3,8,"UN","วันสตรีสากล","International Women's Day","เฉลิมฉลองความสำเร็จของผู้หญิงและรณรงค์เพื่อความเท่าเทียมทางเพศทั่วโลก","Celebrates women's achievements and calls for gender equality worldwide.","international"),
+E(3,17,"IE","วันนักบุญแพทริก","St Patrick's Day","วันชาติไอร์แลนด์ ระลึกถึงนักบุญแพทริก ทั่วโลกฉลองด้วยสีเขียว แชมร็อก และขบวนพาเหรด","Ireland's national day, celebrated worldwide with green, shamrocks and parades.","cultural"),
+E(3,20,"UN","วันความสุขสากล","International Day of Happiness","สหประชาชาติชี้ว่าความสุขเป็นเป้าหมายพื้นฐานของมนุษย์และควรอยู่ในนโยบายการพัฒนา","The UN recognises happiness as a fundamental human goal and development objective.","international"),
+E(3,21,"IR","เนารูซ — ปีใหม่เปอร์เซีย","Nowruz — Persian New Year","ปีใหม่ตามปฏิทินสุริยคติเปอร์เซีย ตรงกับวันวสันตวิษุวัต ฉลองในอิหร่าน อัฟกานิสถาน เอเชียกลางและคอเคซัส","Persian solar new year at the spring equinox, celebrated across Iran, Afghanistan, Central Asia and the Caucasus.","cultural"),
+E(3,21,"UN","วันขจัดการเลือกปฏิบัติทางเชื้อชาติ","Day for Elimination of Racial Discrimination","ระลึกถึงเหตุการณ์ชาร์ปวิลล์ในแอฟริกาใต้ ค.ศ. 1960 และรณรงค์ต่อต้านการเหยียดเชื้อชาติ","Commemorates the 1960 Sharpeville massacre and campaigns against racism.","international"),
+E(3,21,"UN","วันดาวน์ซินโดรมโลก","World Down Syndrome Day","เลือกวันที่ 21/3 เพื่อสื่อถึงโครโมโซมคู่ที่ 21 ที่มีสามแท่ง ส่งเสริมสิทธิและการยอมรับ","The date 21/3 reflects the third copy of chromosome 21; promotes rights and inclusion.","observance"),
+E(3,22,"UN","วันน้ำโลก","World Water Day","รณรงค์เรื่องการเข้าถึงน้ำสะอาดและการจัดการทรัพยากรน้ำอย่างยั่งยืน","Highlights access to clean water and sustainable water management.","international"),
+E(3,25,"GR","วันเอกราชกรีซ","Greek Independence Day","ค.ศ. 1821 กรีซเริ่มสงครามประกาศอิสรภาพจากจักรวรรดิออตโตมัน","In 1821 Greece began its war of independence from the Ottoman Empire.","national"),
+E(3,26,"BD","วันเอกราชบังกลาเทศ","Bangladesh Independence Day","ค.ศ. 1971 บังกลาเทศประกาศเอกราชจากปากีสถาน","Bangladesh declared independence from Pakistan in 1971.","national"),
+E(4,1,"INT","วันเอพริลฟูลส์","April Fools' Day","ประเพณีเล่นตลกและแกล้งกันอย่างไม่มีพิษภัยในวันแรกของเดือนเมษายน","A tradition of harmless pranks and hoaxes on the first day of April.","cultural"),
+E(4,2,"UN","วันตระหนักรู้ออทิสติกโลก","World Autism Awareness Day","ส่งเสริมความเข้าใจและการยอมรับผู้มีภาวะออทิสติกในสังคม","Promotes understanding and acceptance of autistic people.","observance"),
+E(4,6,"TH","วันจักรี","Chakri Memorial Day","ระลึกถึงการสถาปนาราชวงศ์จักรีและการก่อตั้งกรุงรัตนโกสินทร์ในปี พ.ศ. 2325","Commemorates the founding of the Chakri dynasty and Bangkok as capital in 1782.","national"),
+E(4,7,"UN","วันอนามัยโลก","World Health Day","ครบรอบการก่อตั้งองค์การอนามัยโลกในปี ค.ศ. 1948 มีการรณรงค์ประเด็นสุขภาพประจำปี","Anniversary of the WHO's founding in 1948, with an annual global health theme.","international"),
+E(4,7,"RW","วันรำลึกการฆ่าล้างเผ่าพันธุ์","Genocide Memorial Day","รำลึกถึงเหยื่อการฆ่าล้างเผ่าพันธุ์ชาวทุตซีในรวันดาเมื่อปี ค.ศ. 1994","Remembers the victims of the 1994 genocide against the Tutsi in Rwanda.","observance"),
+E(4,13,"TH","วันสงกรานต์ · วันผู้สูงอายุแห่งชาติ","Songkran — Thai New Year","ปีใหม่ไทยตามประเพณี มีการรดน้ำดำหัวผู้ใหญ่ สรงน้ำพระ และเล่นสาดน้ำ ยูเนสโกขึ้นทะเบียนเป็นมรดกภูมิปัญญาทางวัฒนธรรมในปี ค.ศ. 2023","Thai traditional new year with water pouring on elders, bathing Buddha images and water fights. Inscribed by UNESCO in 2023.","cultural"),
+E(4,13,"MM","เทศกาลตะจาน — ปีใหม่เมียนมา","Thingyan Water Festival","เทศกาลสาดน้ำปีใหม่ของเมียนมา เชื่อว่าน้ำช่วยชำระล้างสิ่งไม่ดีของปีเก่า","Myanmar's new year water festival; water is believed to wash away the old year's misfortune.","cultural"),
+E(4,14,"LA","บุญปีใหม่ลาว","Lao New Year","ปีใหม่ตามประเพณีของลาว ฉลอง 3 วัน ด้วยการสรงน้ำพระ ก่อเจดีย์ทราย และสาดน้ำ","Lao traditional new year: three days of Buddha bathing, sand stupas and water splashing.","cultural"),
+E(4,14,"KH","ปีใหม่เขมร","Khmer New Year","ปีใหม่ประเพณีกัมพูชา ฉลอง 3 วัน มีการละเล่นพื้นบ้านและทำบุญที่วัด","Cambodian traditional new year: three days of temple merit-making and folk games.","cultural"),
+E(4,22,"UN","วันคุ้มครองโลก","Earth Day","เริ่มในสหรัฐฯ ปี ค.ศ. 1970 ปัจจุบันเป็นวันรณรงค์สิ่งแวดล้อมที่ใหญ่ที่สุดในโลก","Begun in the US in 1970, now the world's largest environmental campaign day.","international"),
+E(4,23,"UN","วันหนังสือและลิขสิทธิ์โลก","World Book and Copyright Day","ยูเนสโกเลือกวันนี้เพราะเป็นวันถึงแก่กรรมของทั้งเชกสเปียร์และเซร์บันเตส","UNESCO chose this date — the death anniversary of both Shakespeare and Cervantes.","international"),
+E(4,23,"TR","วันอธิปไตยแห่งชาติและวันเด็ก","National Sovereignty and Children's Day","ค.ศ. 1920 เปิดสมัชชาแห่งชาติตุรกี อตาเติร์กอุทิศวันนี้ให้เด็กทั่วโลก","Marks the 1920 opening of Turkey's Grand National Assembly; Atatürk dedicated the day to children everywhere.","national"),
+E(4,25,"AU","วันแอนแซค","ANZAC Day","ออสเตรเลียและนิวซีแลนด์รำลึกถึงทหารที่ขึ้นบกที่กัลลิโปลีในปี ค.ศ. 1915 และทหารผ่านศึกทั้งหมด","Australia and New Zealand remember the 1915 Gallipoli landings and all who served.","national"),
+E(4,25,"IT","วันปลดปล่อยอิตาลี","Liberation Day","ค.ศ. 1945 อิตาลีได้รับการปลดปล่อยจากลัทธิฟาสซิสต์และการยึดครองของนาซี","Italy's 1945 liberation from fascism and Nazi occupation.","national"),
+E(4,27,"ZA","วันเสรีภาพ","Freedom Day","ค.ศ. 1994 แอฟริกาใต้จัดการเลือกตั้งที่ทุกเชื้อชาติมีสิทธิเป็นครั้งแรก สิ้นสุดระบอบแบ่งแยกสีผิว","South Africa's first non-racial democratic election in 1994, ending apartheid.","national"),
+E(4,27,"NL","วันพระราชา","King's Day","วันคล้ายวันพระราชสมภพสมเด็จพระราชาธิบดีวิลเลม-อเล็กซานเดอร์ ทั้งประเทศแต่งกายสีส้มและจัดตลาดนัดกลางแจ้ง","Birthday of King Willem-Alexander; the country dresses in orange for nationwide street markets.","national"),
+E(4,30,"VN","วันรวมชาติ","Reunification Day","ค.ศ. 1975 สิ้นสุดสงครามเวียดนามและรวมประเทศเป็นหนึ่งเดียว","The 1975 end of the Vietnam War and reunification of the country.","national"),
+E(5,1,"INT","วันแรงงานสากล","International Workers' Day","ระลึกถึงการต่อสู้เพื่อวันทำงาน 8 ชั่วโมง เป็นวันหยุดในกว่า 80 ประเทศ","Commemorates the struggle for the eight-hour workday; a public holiday in over 80 countries.","international"),
+E(5,3,"UN","วันเสรีภาพสื่อมวลชนโลก","World Press Freedom Day","ย้ำหลักการเสรีภาพสื่อและรำลึกถึงนักข่าวที่เสียชีวิตจากการทำหน้าที่","Reaffirms press freedom and honours journalists killed in the line of duty.","international"),
+E(5,3,"PL","วันรัฐธรรมนูญโปแลนด์","Constitution Day","ค.ศ. 1791 โปแลนด์ประกาศใช้รัฐธรรมนูญลายลักษณ์อักษรฉบับแรกของยุโรป","In 1791 Poland adopted Europe's first codified national constitution.","national"),
+E(5,4,"TH","วันฉัตรมงคล","Coronation Day","วันคล้ายวันบรมราชาภิเษกพระบาทสมเด็จพระวชิรเกล้าเจ้าอยู่หัว เมื่อ พ.ศ. 2562 เป็นวันหยุดราชการ","Anniversary of the 2019 coronation of King Vajiralongkorn; a Thai public holiday.","national"),
+E(5,5,"JP","วันเด็กญี่ปุ่น","Children's Day","วันสุดท้ายของสัปดาห์โกลเดนวีก ครอบครัวประดับธงปลาคาร์ปเพื่ออวยพรให้ลูกเติบโตแข็งแรง","Final day of Golden Week; families fly carp streamers wishing children health and strength.","cultural"),
+E(5,5,"MX","วันซิงโกเดมาโย","Cinco de Mayo","ระลึกถึงชัยชนะของเม็กซิโกเหนือฝรั่งเศสที่เมืองปวยบลา ค.ศ. 1862 ฉลองใหญ่ในสหรัฐฯ","Mexico's 1862 victory over France at Puebla, widely celebrated in the United States.","cultural"),
+E(5,8,"EU","วันแห่งชัยชนะในยุโรป","Victory in Europe Day","ค.ศ. 1945 นาซีเยอรมนียอมจำนนอย่างไม่มีเงื่อนไข สิ้นสุดสงครามโลกครั้งที่ 2 ในยุโรป","The 1945 unconditional surrender of Nazi Germany, ending WWII in Europe.","international"),
+E(5,9,"RU","วันแห่งชัยชนะ","Victory Day","รัสเซียและอดีตสาธารณรัฐโซเวียตฉลองชัยชนะเหนือนาซีเยอรมนีในปี ค.ศ. 1945","Russia and former Soviet states mark victory over Nazi Germany in 1945.","national"),
+E(5,12,"UN","วันพยาบาลสากล","International Nurses Day","วันคล้ายวันเกิดฟลอเรนซ์ ไนติงเกล ผู้วางรากฐานการพยาบาลสมัยใหม่","Birthday of Florence Nightingale, founder of modern nursing.","international"),
+E(5,15,"UN","วันครอบครัวสากล","International Day of Families","ย้ำความสำคัญของครอบครัวในฐานะหน่วยพื้นฐานของสังคม","Highlights the family as the basic unit of society.","international"),
+E(5,17,"NO","วันรัฐธรรมนูญนอร์เวย์","Norwegian Constitution Day","ค.ศ. 1814 นอร์เวย์ลงนามรัฐธรรมนูญ ฉลองด้วยขบวนพาเหรดเด็กและชุดประจำชาติบูนาด","Norway signed its constitution in 1814; celebrated with children's parades and bunad costumes.","national"),
+E(5,25,"INT","วันแอฟริกา","Africa Day","ระลึกถึงการก่อตั้งองค์การเอกภาพแอฟริกาในปี ค.ศ. 1963 ซึ่งต่อมาคือสหภาพแอฟริกา","Marks the 1963 founding of the Organisation of African Unity, now the African Union.","international"),
+E(5,31,"UN","วันงดสูบบุหรี่โลก","World No Tobacco Day","องค์การอนามัยโลกรณรงค์ลดการบริโภคยาสูบและเปิดเผยกลยุทธ์ของอุตสาหกรรมบุหรี่","WHO campaign to reduce tobacco use and expose industry tactics.","observance"),
+E(6,1,"INT","วันเด็กสากล","International Children's Day","หลายประเทศโดยเฉพาะในยุโรปตะวันออก เอเชีย และแอฟริกา ฉลองวันเด็กในวันนี้","Celebrated as Children's Day across Eastern Europe, Asia and Africa.","international"),
+E(6,5,"UN","วันสิ่งแวดล้อมโลก","World Environment Day","วันรณรงค์สิ่งแวดล้อมหลักของสหประชาชาติ จัดต่อเนื่องตั้งแต่ปี ค.ศ. 1973","The UN's principal environmental awareness day, held since 1973.","international"),
+E(6,6,"SE","วันชาติสวีเดน","National Day of Sweden","ระลึกถึงการขึ้นครองราชย์ของกุสตาฟ วาซา ค.ศ. 1523 และรัฐธรรมนูญ ค.ศ. 1809","Marks Gustav Vasa's 1523 accession and the 1809 constitution.","national"),
+E(6,12,"PH","วันเอกราชฟิลิปปินส์","Philippine Independence Day","ค.ศ. 1898 ฟิลิปปินส์ประกาศเอกราชจากสเปน","The Philippines declared independence from Spain in 1898.","national"),
+E(6,12,"RU","วันรัสเซีย","Russia Day","ระลึกถึงปฏิญญาอธิปไตยของสหพันธรัฐรัสเซียในปี ค.ศ. 1990","Marks the 1990 declaration of sovereignty of the Russian Federation.","national"),
+E(6,14,"UN","วันผู้บริจาคโลหิตโลก","World Blood Donor Day","ขอบคุณผู้บริจาคโลหิตโดยสมัครใจ ตรงกับวันเกิดคาร์ล ลันด์ชไตเนอร์ ผู้ค้นพบหมู่เลือด","Thanks voluntary blood donors; the birthday of Karl Landsteiner, discoverer of blood groups.","international"),
+E(6,19,"US","วันจูนทีนธ์","Juneteenth","ค.ศ. 1865 ข่าวการเลิกทาสไปถึงรัฐเท็กซัส เป็นวันหยุดราชการกลางของสหรัฐฯ ตั้งแต่ปี ค.ศ. 2021","In 1865 news of emancipation reached Texas; a US federal holiday since 2021.","national"),
+E(6,20,"UN","วันผู้ลี้ภัยโลก","World Refugee Day","ยกย่องความเข้มแข็งของผู้ลี้ภัยและเรียกร้องความช่วยเหลือระหว่างประเทศ","Honours the resilience of refugees and calls for international support.","international"),
+E(6,21,"UN","วันโยคะสากล","International Day of Yoga","ตรงกับครีษมายัน ส่งเสริมโยคะเพื่อสุขภาพกายและใจ ริเริ่มโดยอินเดีย","Held at the summer solstice; promotes yoga for physical and mental wellbeing.","international"),
+E(6,23,"LU","วันชาติลักเซมเบิร์ก","Luxembourg National Day","วันเฉลิมฉลองวันประสูติของแกรนด์ดยุก มีขบวนแห่คบเพลิงและดอกไม้ไฟ","Official birthday of the Grand Duke, marked with torchlight processions and fireworks.","national"),
+E(7,1,"CA","วันชาติแคนาดา","Canada Day","ค.ศ. 1867 รวมอาณานิคมเข้าเป็นสมาพันธรัฐแคนาดา","The 1867 confederation of the Canadian colonies.","national"),
+E(7,1,"HK","วันสถาปนาเขตบริหารพิเศษฮ่องกง","HKSAR Establishment Day","ค.ศ. 1997 สหราชอาณาจักรส่งมอบฮ่องกงคืนแก่จีน","The 1997 handover of Hong Kong from Britain to China.","national"),
+E(7,4,"US","วันประกาศอิสรภาพสหรัฐฯ","Independence Day","ค.ศ. 1776 สภาภาคพื้นทวีปรับรองคำประกาศอิสรภาพจากอังกฤษ ฉลองด้วยพลุและบาร์บีคิว","In 1776 Congress adopted the Declaration of Independence; marked with fireworks and barbecues.","national"),
+E(7,5,"VE","วันเอกราชเวเนซุเอลา","Venezuelan Independence Day","ค.ศ. 1811 เวเนซุเอลาประกาศเอกราชจากสเปน","Venezuela declared independence from Spain in 1811.","national"),
+E(7,9,"AR","วันเอกราชอาร์เจนตินา","Argentine Independence Day","ค.ศ. 1816 อาร์เจนตินาประกาศเอกราชจากสเปนที่เมืองตูกูมัน","Argentina declared independence from Spain at Tucumán in 1816.","national"),
+E(7,14,"FR","วันชาติฝรั่งเศส","Bastille Day","ค.ศ. 1789 ประชาชนบุกทลายคุกบาสตีย์ จุดเริ่มต้นการปฏิวัติฝรั่งเศส มีสวนสนามบนถนนช็องเซลีเซ","The 1789 storming of the Bastille began the French Revolution; marked by the Champs-Élysées parade.","national"),
+E(7,17,"UN","วันยุติธรรมสากล","World Day for International Justice","ระลึกถึงการรับรองธรรมนูญกรุงโรมที่ก่อตั้งศาลอาญาระหว่างประเทศ ค.ศ. 1998","Marks the 1998 adoption of the Rome Statute establishing the ICC.","international"),
+E(7,20,"CO","วันเอกราชโคลอมเบีย","Colombian Independence Day","ค.ศ. 1810 เริ่มการเคลื่อนไหวเรียกร้องเอกราชจากสเปนที่กรุงโบโกตา","The 1810 cry for independence from Spain in Bogotá.","national"),
+E(7,21,"BE","วันชาติเบลเยียม","Belgian National Day","ค.ศ. 1831 พระเจ้าเลโอโปลด์ที่ 1 ทรงสาบานตนเป็นกษัตริย์พระองค์แรกของเบลเยียม","In 1831 Leopold I swore the oath as Belgium's first king.","national"),
+E(7,23,"EG","วันปฏิวัติอียิปต์","Revolution Day","ค.ศ. 1952 การปฏิวัติโค่นระบอบกษัตริย์และสถาปนาสาธารณรัฐอียิปต์","The 1952 revolution that ended the monarchy and created the Egyptian republic.","national"),
+E(7,28,"TH","วันเฉลิมพระชนมพรรษา","HM The King's Birthday","วันคล้ายวันพระราชสมภพพระบาทสมเด็จพระวชิรเกล้าเจ้าอยู่หัว เป็นวันหยุดราชการของไทย","Birthday of King Vajiralongkorn of Thailand; a national public holiday.","national"),
+E(7,28,"PE","วันเอกราชเปรู","Peruvian Independence Day","ค.ศ. 1821 ซาน มาร์ติน ประกาศเอกราชของเปรูจากสเปน","San Martín proclaimed Peru's independence from Spain in 1821.","national"),
+E(7,30,"UN","วันมิตรภาพสากล","International Day of Friendship","ส่งเสริมมิตรภาพระหว่างผู้คน ประเทศ และวัฒนธรรม เพื่อสันติภาพที่ยั่งยืน","Promotes friendship between peoples, countries and cultures as a basis for peace.","international"),
+E(8,1,"CH","วันชาติสวิตเซอร์แลนด์","Swiss National Day","ระลึกถึงสนธิสัญญาสหพันธรัฐปี ค.ศ. 1291 ที่ถือเป็นจุดกำเนิดสมาพันธรัฐสวิส","Marks the 1291 Federal Charter, considered the founding of the Swiss Confederation.","national"),
+E(8,6,"JP","วันรำลึกสันติภาพฮิโรชิมา","Hiroshima Peace Memorial Day","ค.ศ. 1945 ระเบิดปรมาณูถูกทิ้งที่ฮิโรชิมา มีพิธีอธิษฐานเพื่อสันติภาพและการปลดอาวุธนิวเคลียร์","The 1945 atomic bombing of Hiroshima, remembered with prayers for peace and nuclear disarmament.","observance"),
+E(8,9,"SG","วันชาติสิงคโปร์","Singapore National Day","ค.ศ. 1965 สิงคโปร์แยกตัวจากมาเลเซียและกลายเป็นรัฐเอกราช","Singapore separated from Malaysia and became independent in 1965.","national"),
+E(8,9,"UN","วันชนเผ่าพื้นเมืองโลก","Day of the World's Indigenous Peoples","ส่งเสริมสิทธิ ภาษา และวัฒนธรรมของชนเผ่าพื้นเมืองกว่า 476 ล้านคนทั่วโลก","Promotes the rights, languages and cultures of the world's 476 million indigenous people.","international"),
+E(8,12,"TH","วันแม่แห่งชาติ","Thai Mother's Day","วันคล้ายวันพระราชสมภพสมเด็จพระนางเจ้าสิริกิติ์ พระบรมราชินีนาถ พระบรมราชชนนีพันปีหลวง ลูก ๆ นิยมมอบดอกมะลิให้แม่","Birthday of Queen Sirikit the Queen Mother; children traditionally give jasmine flowers to their mothers.","national"),
+E(8,12,"UN","วันเยาวชนสากล","International Youth Day","ย้ำบทบาทของเยาวชนในการพัฒนาสังคมและการแก้ปัญหาระดับโลก","Highlights the role of young people in social development and global problem-solving.","international"),
+E(8,14,"PK","วันเอกราชปากีสถาน","Pakistan Independence Day","ค.ศ. 1947 ปากีสถานได้รับเอกราชจากอังกฤษ","Pakistan gained independence from Britain in 1947.","national"),
+E(8,15,"IN","วันเอกราชอินเดีย","Indian Independence Day","ค.ศ. 1947 อินเดียได้รับเอกราชจากอังกฤษ นายกรัฐมนตรีเชิญธงชาติที่ป้อมแดง","India gained independence from Britain in 1947; the PM raises the flag at the Red Fort.","national"),
+E(8,15,"KR","วันปลดปล่อยเกาหลี","National Liberation Day","ค.ศ. 1945 เกาหลีได้รับการปลดปล่อยจากการปกครองของญี่ปุ่น","Korea's 1945 liberation from Japanese rule.","national"),
+E(8,17,"ID","วันเอกราชอินโดนีเซีย","Indonesian Independence Day","ค.ศ. 1945 ซูการ์โนประกาศเอกราชจากเนเธอร์แลนด์ มีการแข่งขันพื้นบ้านทั่วประเทศ","Sukarno proclaimed independence from the Netherlands in 1945; marked by nationwide folk games.","national"),
+E(8,19,"UN","วันมนุษยธรรมโลก","World Humanitarian Day","ระลึกถึงเจ้าหน้าที่ช่วยเหลือมนุษยธรรมที่เสียชีวิตจากเหตุระเบิดในกรุงแบกแดด ค.ศ. 2003","Honours aid workers killed in the 2003 Baghdad bombing and those serving today.","international"),
+E(8,24,"UA","วันเอกราชยูเครน","Ukrainian Independence Day","ค.ศ. 1991 ยูเครนประกาศเอกราชจากสหภาพโซเวียต","Ukraine declared independence from the Soviet Union in 1991.","national"),
+E(8,31,"MY","วันเมอร์เดกา — วันชาติมาเลเซีย","Merdeka Day","ค.ศ. 1957 สหพันธรัฐมาลายาได้รับเอกราชจากอังกฤษ","The Federation of Malaya gained independence from Britain in 1957.","national"),
+E(9,2,"VN","วันชาติเวียดนาม","Vietnam National Day","ค.ศ. 1945 โฮจิมินห์อ่านคำประกาศอิสรภาพที่จัตุรัสบาดิ่ญ","In 1945 Hồ Chí Minh read the Declaration of Independence at Ba Đình Square.","national"),
+E(9,7,"BR","วันเอกราชบราซิล","Brazilian Independence Day","ค.ศ. 1822 เจ้าชายดน เปดรู ประกาศเอกราชจากโปรตุเกส","Dom Pedro declared independence from Portugal in 1822.","national"),
+E(9,8,"UN","วันการรู้หนังสือสากล","International Literacy Day","ยูเนสโกรณรงค์ให้ทุกคนอ่านออกเขียนได้ ซึ่งถือเป็นสิทธิมนุษยชนพื้นฐาน","UNESCO campaign for literacy as a fundamental human right.","international"),
+E(9,15,"UN","วันประชาธิปไตยสากล","International Day of Democracy","ส่งเสริมหลักการประชาธิปไตย การมีส่วนร่วม และธรรมาภิบาล","Promotes democratic principles, participation and good governance.","international"),
+E(9,15,"GT","วันเอกราชอเมริกากลาง","Central American Independence Day","ค.ศ. 1821 กัวเตมาลา ฮอนดูรัส เอลซัลวาดอร์ นิการากัว และคอสตาริกา ประกาศเอกราชจากสเปนพร้อมกัน","In 1821 Guatemala, Honduras, El Salvador, Nicaragua and Costa Rica jointly declared independence from Spain.","national"),
+E(9,16,"MX","วันเอกราชเม็กซิโก","Mexican Independence Day","ค.ศ. 1810 บาทหลวงอีดัลโกเรียกร้องให้ลุกขึ้นสู้กับสเปน ประธานาธิบดีจะเปล่งเสียงร้อง ¡Viva México! ในคืนวันที่ 15","In 1810 Father Hidalgo called for revolt against Spain; the President gives the Grito on the night of the 15th.","national"),
+E(9,16,"UN","วันโอโซนโลก","World Ozone Day","ระลึกถึงพิธีสารมอนทรีออล ค.ศ. 1987 ที่ประสบความสำเร็จในการฟื้นฟูชั้นโอโซน","Marks the 1987 Montreal Protocol, one of the most successful environmental treaties.","international"),
+E(9,18,"CL","วันเอกราชชิลี","Chilean Independence Day","ค.ศ. 1810 ชิลีตั้งรัฐบาลปกครองตนเองชุดแรก ฉลองด้วยการเต้นกวยกาและงานรื่นเริง","Chile's first self-governing junta in 1810, celebrated with cueca dancing and fondas.","national"),
+E(9,21,"UN","วันสันติภาพสากล","International Day of Peace","สหประชาชาติเรียกร้องให้หยุดยิงทั่วโลกเป็นเวลา 24 ชั่วโมง มีพิธีตีระฆังสันติภาพที่สำนักงานใหญ่","The UN calls for 24 hours of global ceasefire; the Peace Bell is rung at UN Headquarters.","international"),
+E(9,23,"SA","วันชาติซาอุดีอาระเบีย","Saudi National Day","ค.ศ. 1932 รวมดินแดนเข้าเป็นราชอาณาจักรซาอุดีอาระเบีย","The 1932 unification of the Kingdom of Saudi Arabia.","national"),
+E(9,24,"TH","วันมหิดล","Mahidol Day","วันคล้ายวันสวรรคตของสมเด็จพระมหิตลาธิเบศร อดุลยเดชวิกรม พระบรมราชชนก พระบิดาแห่งการแพทย์แผนปัจจุบันของไทย","Anniversary of the death of Prince Mahidol Adulyadej, regarded as the father of modern Thai medicine.","national"),
+E(9,30,"UN","วันนักแปลสากล","International Translation Day","ตรงกับวันนักบุญเจอโรม ผู้แปลคัมภีร์ไบเบิลเป็นภาษาละติน ยกย่องงานแปลที่เชื่อมโยงผู้คน","Feast of St Jerome, translator of the Bible into Latin; honours translators who connect peoples.","international"),
+E(10,1,"CN","วันชาติจีน","China National Day","ค.ศ. 1949 ประกาศสถาปนาสาธารณรัฐประชาชนจีน เป็นจุดเริ่มต้นวันหยุดยาวโกลเดนวีก","The 1949 founding of the People's Republic of China, beginning the Golden Week holiday.","national"),
+E(10,1,"NG","วันเอกราชไนจีเรีย","Nigerian Independence Day","ค.ศ. 1960 ไนจีเรียได้รับเอกราชจากอังกฤษ","Nigeria gained independence from Britain in 1960.","national"),
+E(10,1,"UN","วันผู้สูงอายุสากล","International Day of Older Persons","ส่งเสริมสิทธิ สุขภาพ และศักดิ์ศรีของผู้สูงอายุทั่วโลก","Promotes the rights, health and dignity of older people worldwide.","international"),
+E(10,2,"IN","วันอหิงสาสากล","International Day of Non-Violence","วันเกิดมหาตมะ คานธี ผู้นำแนวทางสันติวิธี สหประชาชาติกำหนดให้เป็นวันอหิงสาสากล","Birthday of Mahatma Gandhi, pioneer of non-violent resistance; designated by the UN.","international"),
+E(10,3,"DE","วันเอกภาพเยอรมัน","German Unity Day","ค.ศ. 1990 เยอรมนีตะวันออกและตะวันตกรวมเป็นประเทศเดียว","East and West Germany were reunified in 1990.","national"),
+E(10,3,"KR","วันสถาปนาประเทศเกาหลี","National Foundation Day","ระลึกถึงการก่อตั้งอาณาจักรโคโจซอนโดยทันกุนตามตำนาน เมื่อ 2333 ปีก่อนคริสตกาล","Legendary founding of Gojoseon by Dangun in 2333 BCE.","national"),
+E(10,5,"UN","วันครูโลก","World Teachers' Day","ยูเนสโกยกย่องบทบาทของครูและรณรงค์เรื่องสถานะของวิชาชีพครู","UNESCO day honouring teachers and advocating for the profession.","international"),
+E(10,9,"KR","วันฮันกึล","Hangul Day","ระลึกถึงการประกาศใช้อักษรฮันกึลโดยพระเจ้าเซจงมหาราชในปี ค.ศ. 1446","Marks King Sejong's promulgation of the Hangul alphabet in 1446.","national"),
+E(10,10,"UN","วันสุขภาพจิตโลก","World Mental Health Day","รณรงค์ความเข้าใจเรื่องสุขภาพจิตและลดการตีตราผู้มีภาวะทางจิตใจ","Raises mental health awareness and fights stigma.","observance"),
+E(10,10,"TW","วันชาติไต้หวัน","Double Ten Day","ระลึกถึงการลุกฮือที่อู่ชางในปี ค.ศ. 1911 ซึ่งนำไปสู่การสถาปนาสาธารณรัฐจีน","Marks the 1911 Wuchang Uprising that led to the founding of the Republic of China.","national"),
+E(10,12,"ES","วันชาติสเปน","National Day of Spain","ตรงกับวันที่โคลัมบัสขึ้นฝั่งทวีปอเมริกา ค.ศ. 1492 หลายประเทศลาตินอเมริกาเรียกว่า Día de la Raza","Marks Columbus's 1492 landfall in the Americas; known in Latin America as Día de la Raza.","national"),
+E(10,13,"TH","วันนวมินทรมหาราช","King Bhumibol Memorial Day","วันคล้ายวันสวรรคตพระบาทสมเด็จพระบรมชนกาธิเบศร มหาภูมิพลอดุลยเดชมหาราช บรมนาถบพิตร เป็นวันหยุดราชการ","Anniversary of the passing of King Bhumibol Adulyadej the Great; a Thai public holiday.","national"),
+E(10,16,"UN","วันอาหารโลก","World Food Day","ครบรอบการก่อตั้ง FAO ค.ศ. 1945 รณรงค์ขจัดความหิวโหยและสร้างความมั่นคงทางอาหาร","Anniversary of the FAO's founding in 1945; campaigns against hunger.","international"),
+E(10,23,"TH","วันปิยมหาราช","Chulalongkorn Day","วันคล้ายวันสวรรคตพระบาทสมเด็จพระจุลจอมเกล้าเจ้าอยู่หัว ผู้ทรงประกาศเลิกทาสและปฏิรูปสยามสู่ความทันสมัย","Anniversary of the death of King Chulalongkorn, who abolished slavery and modernised Siam.","national"),
+E(10,24,"UN","วันสหประชาชาติ","United Nations Day","ค.ศ. 1945 กฎบัตรสหประชาชาติมีผลบังคับใช้ ถือเป็นวันก่อตั้งองค์การ","The UN Charter entered into force in 1945, the organisation's founding date.","international"),
+E(10,26,"AT","วันชาติออสเตรีย","Austrian National Day","ค.ศ. 1955 ออสเตรียประกาศความเป็นกลางถาวรหลังกองทัพต่างชาติถอนกำลังออก","In 1955 Austria declared permanent neutrality after foreign troops withdrew.","national"),
+E(10,29,"TR","วันสาธารณรัฐตุรกี","Republic Day","ค.ศ. 1923 อตาเติร์กประกาศสถาปนาสาธารณรัฐตุรกี","Atatürk proclaimed the Republic of Türkiye in 1923.","national"),
+E(10,31,"INT","วันฮาโลวีน","Halloween","มีรากจากเทศกาลซาวินของชาวเคลต์ ปัจจุบันเด็ก ๆ แต่งชุดแฟนซีและขอขนมตามบ้าน","Rooted in the Celtic festival of Samhain; children now dress up and trick-or-treat.","cultural"),
+E(11,1,"MX","วันแห่งผู้วายชนม์","Day of the Dead","ชาวเม็กซิกันรำลึกถึงผู้ล่วงลับด้วยแท่นบูชา ดอกดาวเรือง และกะโหลกน้ำตาล ยูเนสโกขึ้นทะเบียนเป็นมรดกวัฒนธรรม","Mexicans honour the dead with ofrendas, marigolds and sugar skulls; a UNESCO heritage tradition.","cultural"),
+E(11,5,"GB","คืนกาย ฟอกส์","Guy Fawkes Night","ระลึกถึงแผนดินปืนที่ล้มเหลวในปี ค.ศ. 1605 ฉลองด้วยกองไฟและดอกไม้ไฟ","Marks the failed 1605 Gunpowder Plot, celebrated with bonfires and fireworks.","cultural"),
+E(11,11,"INT","วันสงบศึก · วันรำลึกทหารผ่านศึก","Armistice / Remembrance Day","เวลา 11 นาฬิกาของวันที่ 11 เดือน 11 ปี ค.ศ. 1918 สงครามโลกครั้งที่ 1 ยุติลง มีการติดดอกป๊อปปี้รำลึก","At 11am on 11 November 1918 WWI ended; remembered by wearing poppies.","international"),
+E(11,11,"PL","วันเอกราชโปแลนด์","Polish Independence Day","ค.ศ. 1918 โปแลนด์ฟื้นเอกราชหลังถูกแบ่งแยกนาน 123 ปี","Poland regained independence in 1918 after 123 years of partition.","national"),
+E(11,14,"IN","วันเด็กอินเดีย","Children's Day","วันเกิดชวาหะร์ลาล เนห์รู นายกรัฐมนตรีคนแรกผู้เป็นที่รักของเด็ก ๆ","Birthday of Jawaharlal Nehru, India's first PM, known for his love of children.","national"),
+E(11,15,"BR","วันสาธารณรัฐบราซิล","Republic Proclamation Day","ค.ศ. 1889 บราซิลล้มระบอบกษัตริย์และสถาปนาสาธารณรัฐ","Brazil deposed the monarchy and became a republic in 1889.","national"),
+E(11,16,"UN","วันขันติธรรมสากล","International Day for Tolerance","ยูเนสโกส่งเสริมความเคารพในความแตกต่างทางวัฒนธรรม ศาสนา และความคิด","UNESCO day promoting respect for cultural, religious and intellectual diversity.","international"),
+E(11,19,"INT","วันผู้ชายสากล","International Men's Day","ให้ความสำคัญกับสุขภาพกายและใจของผู้ชาย และบทบาทเชิงบวกในครอบครัวและสังคม","Focuses on men's physical and mental health and positive male role models.","observance"),
+E(11,20,"UN","วันเด็กโลก","World Children's Day","ครบรอบการรับรองอนุสัญญาว่าด้วยสิทธิเด็ก ค.ศ. 1989 ส่งเสริมสิทธิและสวัสดิภาพเด็ก","Anniversary of the 1989 Convention on the Rights of the Child.","international"),
+E(11,25,"UN","วันขจัดความรุนแรงต่อสตรีสากล","Day to End Violence against Women","เปิดแคมเปญ 16 วันรณรงค์ยุติความรุนแรงด้วยเหตุแห่งเพศ","Launches the 16 Days of Activism against gender-based violence.","international"),
+E(11,30,"SCT","วันนักบุญแอนดรูว์","St Andrew's Day","วันชาติสกอตแลนด์ ระลึกถึงนักบุญแอนดรูว์ นักบุญองค์อุปถัมภ์","Scotland's national day honouring its patron saint, Andrew.","cultural"),
+E(12,1,"UN","วันเอดส์โลก","World AIDS Day","รณรงค์ความเข้าใจเรื่องเอชไอวี ลดการตีตรา และรำลึกถึงผู้เสียชีวิต","Raises HIV awareness, fights stigma and remembers those lost.","observance"),
+E(12,1,"RO","วันชาติโรมาเนีย","Romanian National Day","ค.ศ. 1918 ทรานซิลเวเนียรวมเข้ากับโรมาเนีย","The 1918 union of Transylvania with Romania.","national"),
+E(12,2,"AE","วันชาติสหรัฐอาหรับเอมิเรตส์","UAE National Day","ค.ศ. 1971 เจ็ดรัฐรวมกันก่อตั้งสหรัฐอาหรับเอมิเรตส์","Seven emirates united to form the UAE in 1971.","national"),
+E(12,5,"TH","วันชาติไทย · วันพ่อแห่งชาติ","Thai National Day & Father's Day","วันคล้ายวันพระราชสมภพพระบาทสมเด็จพระบรมชนกาธิเบศร มหาภูมิพลอดุลยเดชมหาราช เป็นวันชาติและวันพ่อแห่งชาติของไทย","Birthday of the late King Bhumibol Adulyadej the Great, observed as Thailand's National Day and Father's Day.","national"),
+E(12,6,"FI","วันเอกราชฟินแลนด์","Finnish Independence Day","ค.ศ. 1917 ฟินแลนด์ประกาศเอกราชจากรัสเซีย ผู้คนนิยมจุดเทียนสองเล่มที่หน้าต่าง","Finland declared independence from Russia in 1917; two candles are placed in windows.","national"),
+E(12,10,"UN","วันสิทธิมนุษยชนสากล","Human Rights Day","ค.ศ. 1948 สหประชาชาติรับรองปฏิญญาสากลว่าด้วยสิทธิมนุษยชน","The UN adopted the Universal Declaration of Human Rights in 1948.","international"),
+E(12,10,"TH","วันรัฐธรรมนูญ","Constitution Day","ระลึกถึงการพระราชทานรัฐธรรมนูญฉบับถาวรฉบับแรกของสยามเมื่อ พ.ศ. 2475","Commemorates the granting of Siam's first permanent constitution in 1932.","national"),
+E(12,12,"KE","วันจัมฮูรี","Jamhuri Day","ค.ศ. 1963 เคนยาได้รับเอกราชจากอังกฤษ และเป็นสาธารณรัฐในปี ค.ศ. 1964","Kenya gained independence from Britain in 1963 and became a republic in 1964.","national"),
+E(12,16,"ZA","วันแห่งการปรองดอง","Day of Reconciliation","แอฟริกาใต้ใช้วันนี้สร้างความสมานฉันท์ระหว่างกลุ่มชาติพันธุ์หลังยุคแบ่งแยกสีผิว","South Africa's post-apartheid day for national reconciliation.","national"),
+E(12,18,"QA","วันชาติกาตาร์","Qatar National Day","ระลึกถึงการรวมชาติภายใต้ชีคจัสซิม บิน โมฮัมเหม็ด ในปี ค.ศ. 1878","Marks the 1878 unification of Qatar under Sheikh Jassim bin Mohammed.","national"),
+E(12,24,"INT","วันคริสต์มาสอีฟ","Christmas Eve","คืนก่อนวันคริสต์มาส หลายประเทศถือเป็นค่ำคืนสำคัญที่สุด มีมื้อค่ำรวมญาติและพิธีมิสซาเที่ยงคืน","The night before Christmas, in many countries the main celebration with family dinner and midnight mass.","religious"),
+E(12,25,"INT","วันคริสต์มาส","Christmas Day","วันสมโภชการประสูติของพระเยซูคริสต์ เป็นวันหยุดในกว่า 160 ประเทศทั่วโลก","Celebrates the birth of Jesus Christ; a public holiday in over 160 countries.","religious"),
+E(12,26,"GB","วันบ็อกซิ่งเดย์","Boxing Day","วันหยุดหลังคริสต์มาสในสหราชอาณาจักรและเครือจักรภพ เดิมเป็นวันมอบของขวัญแก่คนรับใช้และผู้ยากไร้","Post-Christmas holiday in the UK and Commonwealth, once a day of giving boxes to servants and the poor.","cultural"),
+E(12,31,"INT","วันสิ้นปี","New Year's Eve","คืนส่งท้ายปีเก่า มีการนับถอยหลังและจุดพลุทั่วโลก","The final night of the year, marked by countdowns and fireworks worldwide.","cultural")
+];
+
+/* ============ 3) วันที่เลื่อน ============ */
+const nth=(mo,wd,n)=>y=>{const f=new Date(Date.UTC(y,mo-1,1)).getUTCDay();
+  const day=1+((wd-f+7)%7)+(n-1)*7, dim=new Date(Date.UTC(y,mo,0)).getUTCDate();
+  return day>dim?null:{m:mo,d:day};};
+const lastW=(mo,wd)=>y=>{const dim=new Date(Date.UTC(y,mo,0)).getUTCDate();
+  const dw=new Date(Date.UTC(y,mo-1,dim)).getUTCDay();return{m:mo,d:dim-((dw-wd+7)%7)};};
+function easterDate(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,
+ f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,
+ l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),
+ da=((h+l-7*m+114)%31)+1;return new Date(Date.UTC(y,mo-1,da));}
+const easter=off=>y=>{const t=easterDate(y);t.setUTCDate(t.getUTCDate()+off);return{m:t.getUTCMonth()+1,d:t.getUTCDate()};};
+const tbl=o=>y=>o[y]?{m:o[y][0],d:o[y][1]}:null;
+
+const MOVABLE=[
+ MV(nth(1,1,3),"US","วันมาร์ติน ลูเทอร์ คิง จูเนียร์","Martin Luther King Jr. Day","วันจันทร์ที่ 3 ของเดือนมกราคม ระลึกถึงผู้นำขบวนการสิทธิพลเมืองอเมริกัน","Third Monday of January, honouring the American civil rights leader.","national"),
+ MV(nth(1,6,2),"TH","วันเด็กแห่งชาติ","Thai National Children's Day","วันเสาร์ที่ 2 ของเดือนมกราคม หน่วยงานรัฐเปิดให้เด็กเข้าชมฟรีและมีคำขวัญวันเด็กจากนายกรัฐมนตรี","Second Saturday of January; government offices open to children and the PM issues a motto.","national"),
+ MV(nth(2,1,3),"US","วันประธานาธิบดี","Presidents' Day","วันจันทร์ที่ 3 ของเดือนกุมภาพันธ์ ระลึกถึงจอร์จ วอชิงตัน และประธานาธิบดีทุกคน","Third Monday of February, honouring George Washington and all US presidents.","national"),
+ MV(easter(-47),"BR","เทศกาลคาร์นิวัล","Carnival","วันอังคารก่อนเข้าเทศกาลมหาพรต 47 วันก่อนอีสเตอร์ บราซิลจัดขบวนแซมบ้าที่ใหญ่ที่สุดในโลก","Shrove Tuesday, 47 days before Easter; Brazil hosts the world's largest samba parades.","cultural"),
+ MV(easter(-2),"INT","วันศุกร์ประเสริฐ","Good Friday","วันระลึกการตรึงกางเขนของพระเยซู เป็นวันหยุดในหลายประเทศที่นับถือคริสต์ศาสนา","Commemorates the crucifixion of Jesus; a public holiday in many Christian countries.","religious"),
+ MV(easter(0),"INT","วันอีสเตอร์","Easter Sunday","วันสมโภชการคืนพระชนม์ของพระเยซู เป็นวันสำคัญที่สุดในศาสนาคริสต์","Celebrates the resurrection of Jesus, the most important feast in Christianity.","religious"),
+ MV(easter(1),"DE","วันจันทร์อีสเตอร์","Easter Monday","วันหยุดต่อเนื่องจากอีสเตอร์ในยุโรป ออสเตรเลีย และแคนาดา","Public holiday following Easter across Europe, Australia and Canada.","religious"),
+ MV(nth(5,0,2),"US","วันแม่ (สากล)","Mother's Day","วันอาทิตย์ที่ 2 ของเดือนพฤษภาคม ใช้ในสหรัฐฯ และอีกกว่า 80 ประเทศ","Second Sunday of May, observed in the US and over 80 other countries.","cultural"),
+ MV(lastW(5,1),"US","วันรำลึกทหารผ่านศึก","Memorial Day","วันจันทร์สุดท้ายของเดือนพฤษภาคม รำลึกถึงทหารอเมริกันที่เสียชีวิตในสงคราม","Last Monday of May, honouring US military personnel who died in service.","national"),
+ MV(nth(6,0,3),"US","วันพ่อ (สากล)","Father's Day","วันอาทิตย์ที่ 3 ของเดือนมิถุนายน ใช้ในสหรัฐฯ สหราชอาณาจักร และอีกหลายประเทศ","Third Sunday of June, observed in the US, UK and many other countries.","cultural"),
+ MV(nth(9,1,1),"US","วันแรงงานสหรัฐฯ","Labor Day","วันจันทร์แรกของเดือนกันยายน ถือเป็นวันปิดฤดูร้อนอย่างไม่เป็นทางการ","First Monday of September, the unofficial end of the American summer.","national"),
+ MV(nth(9,1,3),"JP","วันเคารพผู้สูงอายุ","Respect for the Aged Day","วันจันทร์ที่ 3 ของเดือนกันยายน ญี่ปุ่นแสดงความเคารพต่อผู้สูงอายุ","Third Monday of September; Japan honours its elderly citizens.","national"),
+ MV(nth(10,1,2),"CA","วันขอบคุณพระเจ้าแคนาดา","Canadian Thanksgiving","วันจันทร์ที่ 2 ของเดือนตุลาคม ขอบคุณสำหรับผลผลิตในฤดูเก็บเกี่ยว","Second Monday of October, giving thanks for the harvest.","cultural"),
+ MV(nth(11,4,4),"US","วันขอบคุณพระเจ้า","Thanksgiving","วันพฤหัสบดีที่ 4 ของเดือนพฤศจิกายน ครอบครัวอเมริกันรวมตัวรับประทานไก่งวง","Fourth Thursday of November; American families gather for turkey dinner.","cultural"),
+ MV(y=>{const t=nth(11,4,4)(y),d=new Date(Date.UTC(y,10,t.d+1));return{m:d.getUTCMonth()+1,d:d.getUTCDate()};},"US","แบล็กฟรายเดย์","Black Friday","วันถัดจากวันขอบคุณพระเจ้า เป็นวันเปิดฤดูกาลช้อปปิ้งลดราคาครั้งใหญ่ทั่วโลก","The day after Thanksgiving, opening the global discount shopping season.","cultural"),
+ MV(tbl({2024:[2,10],2025:[1,29],2026:[2,17],2027:[2,6],2028:[1,26],2029:[2,13],2030:[2,3]}),"CN","วันตรุษจีน","Chinese New Year","ปีใหม่ตามปฏิทินจันทรคติจีน ฉลองในจีน ไต้หวัน สิงคโปร์ มาเลเซีย เวียดนาม (เต๊ต) และชุมชนชาวจีนทั่วโลก","Lunar New Year celebrated in China, Taiwan, Singapore, Malaysia, Vietnam (Tết) and Chinese communities worldwide.","cultural"),
+ MV(tbl({2024:[2,24],2025:[2,12],2026:[3,3],2027:[2,21],2028:[2,10],2029:[2,27],2030:[2,17]}),"TH","วันมาฆบูชา","Makha Bucha Day","วันเพ็ญเดือน 3 ระลึกถึงโอวาทปาติโมกข์ที่พระพุทธเจ้าทรงแสดงแก่พระอรหันต์ 1,250 รูปที่มาประชุมโดยมิได้นัดหมาย","Full moon of the third lunar month, marking the Buddha's teaching to 1,250 spontaneously gathered arahants.","religious",true),
+ MV(tbl({2024:[5,22],2025:[5,11],2026:[5,31],2027:[5,20],2028:[5,8],2029:[5,27],2030:[5,16]}),"TH","วันวิสาขบูชา","Vesak Day","วันประสูติ ตรัสรู้ และปรินิพพานของพระพุทธเจ้า สหประชาชาติรับรองให้เป็นวันสำคัญสากล","Marks the birth, enlightenment and passing of the Buddha; recognised by the UN.","religious",true),
+ MV(tbl({2024:[7,20],2025:[7,10],2026:[7,29],2027:[7,18],2028:[7,6],2029:[7,25],2030:[7,14]}),"TH","วันอาสาฬหบูชา","Asalha Puja Day","ระลึกถึงวันที่พระพุทธเจ้าทรงแสดงปฐมเทศนา และเกิดพระสงฆ์รูปแรกครบองค์พระรัตนตรัย วันถัดไปคือวันเข้าพรรษา","Commemorates the Buddha's first sermon and the first monk's ordination; followed by the start of Buddhist Lent.","religious",true),
+ MV(tbl({2024:[11,15],2025:[11,5],2026:[11,24],2027:[11,13],2028:[10,31],2029:[11,20],2030:[11,9]}),"TH","วันลอยกระทง","Loy Krathong Festival","คืนวันเพ็ญเดือน 12 ผู้คนลอยกระทงเพื่อขอขมาพระแม่คงคาและลอยเคราะห์ ทางภาคเหนือจัดยี่เป็งปล่อยโคมลอย","Full moon of the 12th lunar month; krathongs are floated to thank the water goddess, with lanterns in the North.","cultural",true),
+ MV(tbl({2024:[3,11],2025:[3,1],2026:[2,17],2027:[2,7],2028:[1,27],2029:[1,16],2030:[1,5]}),"ARAB","เริ่มเดือนรอมฎอน","Start of Ramadan","เดือนถือศีลอดของชาวมุสลิมทั่วโลก งดอาหารและน้ำตั้งแต่รุ่งอรุณถึงพระอาทิตย์ตก วันเริ่มขึ้นกับการดูดวงจันทร์","The Islamic month of fasting from dawn to sunset; the exact date depends on moon sighting.","religious",true),
+ MV(tbl({2024:[4,10],2025:[3,30],2026:[3,20],2027:[3,9],2028:[2,26],2029:[2,14],2030:[2,4]}),"ARAB","วันอีฎิ้ลฟิตริ (วันรายอ)","Eid al-Fitr","เทศกาลเฉลิมฉลองการสิ้นสุดเดือนรอมฎอน ครอบครัวละหมาดร่วมกันและเยี่ยมเยียนญาติ","Festival marking the end of Ramadan, with communal prayers and family visits.","religious",true),
+ MV(tbl({2024:[6,16],2025:[6,6],2026:[5,27],2027:[5,16],2028:[5,5],2029:[4,24],2030:[4,13]}),"ARAB","วันอีฎิ้ลอัฎฮา (วันรายอฮัจญี)","Eid al-Adha","เทศกาลแห่งการเสียสละ ตรงกับช่วงประกอบพิธีฮัจญ์ที่นครมักกะฮ์","The Festival of Sacrifice, coinciding with the Hajj pilgrimage in Mecca.","religious",true),
+ MV(tbl({2024:[11,1],2025:[10,20],2026:[11,8],2027:[10,29],2028:[10,17],2029:[11,5],2030:[10,26]}),"IN","เทศกาลดิวาลี","Diwali — Festival of Lights","เทศกาลแห่งแสงของชาวฮินดู ซิกข์ และเชน สื่อถึงชัยชนะของความสว่างเหนือความมืด","Hindu, Sikh and Jain festival of lights, symbolising the victory of light over darkness.","religious",true)
+];
+
+/* ============ 4) แหล่งอ้างอิงและระบบภาษา ============ */
+const clean=s=>s.split(" · ")[0].split(" — ")[0].split(" / ")[0].replace(/\s*\(.*?\)\s*/g," ").trim();
+const W=(lang,s)=>`https://${lang}.wikipedia.org/w/index.php?search=${encodeURIComponent(s)}`;
+
+const REF={
+ "New Year's Day":"https://en.wikipedia.org/wiki/New_Year%27s_Day",
+ "Songkran — Thai New Year":"https://ich.unesco.org/en/RL/songkran-in-thailand-traditional-thai-new-year-festival-01719",
+ "Chinese New Year":"https://en.wikipedia.org/wiki/Chinese_New_Year",
+ "Vesak Day":"https://www.un.org/en/observances/vesak-day",
+ "Makha Bucha Day":"https://en.wikipedia.org/wiki/Magha_Puja",
+ "Asalha Puja Day":"https://en.wikipedia.org/wiki/Asalha_Puja",
+ "Loy Krathong Festival":"https://en.wikipedia.org/wiki/Loy_Krathong",
+ "Eid al-Fitr":"https://en.wikipedia.org/wiki/Eid_al-Fitr",
+ "Eid al-Adha":"https://en.wikipedia.org/wiki/Eid_al-Adha",
+ "Start of Ramadan":"https://en.wikipedia.org/wiki/Ramadan",
+ "Diwali — Festival of Lights":"https://en.wikipedia.org/wiki/Diwali",
+ "Nowruz — Persian New Year":"https://www.un.org/en/observances/international-nowruz-day",
+ "Independence Day":"https://en.wikipedia.org/wiki/Independence_Day_(United_States)",
+ "Bastille Day":"https://en.wikipedia.org/wiki/Bastille_Day",
+ "Thanksgiving":"https://en.wikipedia.org/wiki/Thanksgiving_(United_States)",
+ "Easter Sunday":"https://en.wikipedia.org/wiki/Easter",
+ "Christmas Day":"https://en.wikipedia.org/wiki/Christmas",
+ "Halloween":"https://en.wikipedia.org/wiki/Halloween",
+ "Day of the Dead":"https://ich.unesco.org/en/RL/indigenous-festivity-dedicated-to-the-dead-00054",
+ "International Workers' Day":"https://en.wikipedia.org/wiki/International_Workers%27_Day",
+ "International Women's Day":"https://www.un.org/en/observances/womens-day",
+ "Earth Day":"https://www.earthday.org/",
+ "World Environment Day":"https://www.worldenvironmentday.global/",
+ "Human Rights Day":"https://www.un.org/en/observances/human-rights-day"
+};
+
+const OFF={
+ UN:["un.org","https://www.un.org/en/observances/list-days-weeks"],
+ TH:["bot.or.th","https://www.bot.or.th/en/financial-institutions-holiday.html"],
+ US:["opm.gov","https://www.opm.gov/policy-data-oversight/pay-leave/federal-holidays/"],
+ GB:["gov.uk","https://www.gov.uk/bank-holidays"],
+ JP:["cao.go.jp","https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html"],
+ AU:["australia.gov.au","https://www.australia.gov.au/public-holidays"],
+ CA:["canada.ca","https://www.canada.ca/en/revenue-agency/services/tax/public-holidays.html"],
+ SG:["mom.gov.sg","https://www.mom.gov.sg/employment-practices/public-holidays"],
+ MY:["malaysia.gov.my","https://www.malaysia.gov.my/portal/content/30392"],
+ IN:["india.gov.in","https://www.india.gov.in/calendar"],
+ KR:["korea.net","https://www.korea.net/AboutKorea/Korean-Life/Holidays"],
+ DE:["bundesregierung.de","https://www.bundesregierung.de/"],
+ FR:["service-public.fr","https://www.service-public.fr/particuliers/vosdroits/F2405"]
+};
+
+function refs(e){
+  const L=[];
+  L.push(["Wikipedia EN", REF[e.en] || W("en",clean(e.en))]);
+  L.push(["วิกิพีเดีย TH", W("th",clean(e.th))]);
+  if(OFF[e.c]) L.push(OFF[e.c]);
+  else if(e.c!=="INT"&&e.c!=="ARAB"&&e.c!=="EU") L.push(["timeanddate", "https://www.timeanddate.com/holidays/?query="+encodeURIComponent(clean(e.en))]);
+  return `<b>${LG==="th"?"อ่านต่อ":"Sources"}</b>`+
+    L.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${n}</a>`).join("");
+}
+
+const MN={th:["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"],
+ en:["January","February","March","April","May","June","July","August","September","October","November","December"]};
+const MS={th:["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."],
+ en:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]};
+const DW={th:["อา","จ","อ","พ","พฤ","ศ","ส"],en:["S","M","T","W","T","F","S"]};
+const DWF={th:["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"],
+ en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]};
+const CAT={national:["วันชาติ","National",'var(--nat)'],international:["วันสากล","International",'var(--int)'],
+ religious:["ศาสนา","Religious",'var(--rel)'],cultural:["ประเพณี","Cultural",'var(--cul)'],
+ observance:["รณรงค์","Observance",'var(--obs)']};
+const T={th:{today:"วันสำคัญของวันนี้",none:"วันนี้ไม่มีรายการในฐานข้อมูล",all:"ทั้งปี",allc:"ทุกประเทศ",allk:"ทุกหมวด",
+  filter:"ตัวกรอง",cal:"ปฏิทิน",year:"ปี",cat:"หมวดหมู่",search:"ค้นหาวันสำคัญ หรือ ประเทศ…",
+  n:x=>`${x} รายการ`,nores:"ไม่พบรายการที่ตรงกับเงื่อนไข",ax:"วันที่โดยประมาณ อาจเลื่อนตามประกาศทางการ",
+  foot:"ข้อมูลเพื่อการศึกษา · วันหยุดราชการจริงโปรดตรวจสอบจากประกาศของแต่ละประเทศ"},
+ en:{today:"Today's observances",none:"Nothing in the database for today",all:"Full year",allc:"All countries",allk:"All categories",
+  filter:"Filter",cal:"Calendar",year:"Year",cat:"Category",search:"Search a day or a country…",
+  n:x=>`${x} entries`,nores:"Nothing matches your filters",ax:"Approximate date — subject to official announcement",
+  foot:"For reference only · confirm official public holidays with national sources"}};
+
+/* ============ 5) UI ============ */
+Object.assign(T.th,{todayPill:"วันนี้",reset:"ล้าง",clearAll:"ล้างทั้งหมด",country:"ประเทศ",top:"กลับขึ้นด้านบน",
+  sub:"วันสำคัญทั่วโลก",prev:"ก่อนหน้า",next:"ถัดไป",theme:"เปลี่ยนธีมสี",lang:"ภาษา",src:"แหล่งอ้างอิงหลัก",
+  srcnote:"วันที่ทางจันทรคติและวันหยุดชดเชยอาจต่างกันในแต่ละประเทศ โปรดยืนยันกับประกาศทางการ"});
+Object.assign(T.en,{todayPill:"Today",reset:"Clear",clearAll:"Clear all",country:"Country",top:"Back to top",
+  sub:"Important days worldwide",prev:"Previous",next:"Next",theme:"Toggle theme",lang:"Language",src:"Primary sources",
+  srcnote:"Lunar dates and substitute holidays vary by country — confirm with official announcements."});
+
+const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const NOW0=new Date();
+let LG=LS.get("wd-lang")==="en"?"en":"th";
+let Y=Math.min(2030,Math.max(2024,NOW0.getFullYear())), M=NOW0.getMonth()+1, CO="*", KA="*", Q="", QR="";
+const OPENM=new Set([NOW0.getMonth()+1]);
+const $=s=>document.querySelector(s), t=()=>T[LG];
+const fl=c=>CT[c]?CT[c][2]:"🏳️", cn=c=>CT[c]?CT[c][LG==="th"?0:1]:c;
+const nm=e=>LG==="th"?e.th:e.en, ds=e=>LG==="th"?e.dth:e.den;
+const yr=y=>LG==="th"?y+543:y;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hi=s=>{ if(!Q)return esc(s); const i=s.toLowerCase().indexOf(Q); if(i<0)return esc(s);
+  return esc(s.slice(0,i))+"<mark>"+esc(s.slice(i,i+Q.length))+"</mark>"+esc(s.slice(i+Q.length)); };
+const activeN=()=>(CO!=="*")+(KA!=="*")+(Q?1:0);
+
+const SV=(p,s=16)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const ICON={
+  chev:SV('<path d="m9 6 6 6-6 6"/>'),
+  down:SV('<path d="m6 9 6 6 6-6"/>',15),
+  x:SV('<path d="M18 6 6 18M6 6l12 12"/>',13),
+  info:SV('<circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/>',14),
+  filter:SV('<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',17),
+  cal:SV('<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/>',17)
+};
+
+/* ---------- data helpers ---------- */
+function build(y){const o=FIXED.map(e=>({...e}));
+  MOVABLE.forEach(e=>{const r=e.f(y);if(r)o.push({...e,m:r.m,d:r.d});});
+  o.sort((a,b)=>a.m-b.m||a.d-b.d||a.c.localeCompare(b.c));
+  o.forEach((e,i)=>e.i=i);return o;}
+let DATA=build(Y);
+
+function fil(d){return d.filter(e=>{
+  if(CO!=="*"&&e.c!==CO)return false;
+  if(KA!=="*"&&e.cat!==KA)return false;
+  if(Q){const c=CT[e.c]||[e.c,e.c];
+    const s=(e.th+e.en+e.dth+e.den+c[0]+c[1]).toLowerCase();if(!s.includes(Q))return false;}
+  return true;});}
+
+/* ---------- templates ---------- */
+function item(e,open,yy){
+  const c=CAT[e.cat], cname=c[LG==="th"?0:1];
+  return `<article class="it${open?" open":""}" style="--cc:${c[2]}">
+    <button class="ih" aria-expanded="${!!open}">
+      <span class="fl" aria-hidden="true">${fl(e.c)}</span>
+      <span class="ic"><b>${hi(nm(e))}</b><small><i class="cdot"></i>${cname}<span class="sep">·</span>${cn(e.c)}</small></span>
+      <span class="chev">${ICON.chev}</span>
+    </button>
+    <div class="col"><div class="ci"><div class="ibc">
+      <p>${ds(e)}</p>
+      <div class="mt"><span>${fl(e.c)} ${cn(e.c)}</span><span>${e.d} ${MN[LG][e.m-1]} ${yr(yy)}</span><span><i class="cdot"></i>${cname}</span></div>
+      ${e.ax?`<div class="ax">${ICON.info}<span>${t().ax}</span></div>`:""}
+      <div class="ref">${refs(e)}</div>
+    </div></div></div></article>`;
+}
+const emptyHTML=(msg,ico,reset)=>`<div class="empty"><span class="eico">${ico}</span>${msg}${reset?`<br><button data-clear="all">${t().clearAll}</button>`:""}</div>`;
+
+function renderDays(list){
+  const n=new Date(), days=[];
+  list.forEach(e=>{const l=days[days.length-1];
+    if(l&&l.m===e.m&&l.d===e.d)l.items.push(e);else days.push({m:e.m,d:e.d,items:[e]});});
+  return days.map(g=>{
+    const w=new Date(Y,g.m-1,g.d).getDay();
+    const isNow=n.getFullYear()===Y&&n.getMonth()+1===g.m&&n.getDate()===g.d;
+    return `<section class="day"><div class="dayhd" id="d-${g.m}-${g.d}"><b>${g.d} ${MS[LG][g.m-1]}</b><span>${LG==="th"?"วัน":""}${DWF[LG][w]}</span>${isNow?`<em class="pill">${t().todayPill}</em>`:""}</div>
+      <div class="card">${g.items.map(e=>item(e,false,Y)).join("")}</div></section>`;}).join("");
+}
+
+/* ---------- renderers ---------- */
+function renderStatic(){
+  $("#bsub").textContent=t().sub;
+  $("#q").placeholder=t().search;
+  $("#colab").textContent=t().country; $("#clab").textContent=t().cat; $("#ylab").textContent=t().year;
+  $("#prev").setAttribute("aria-label",t().prev); $("#next").setAttribute("aria-label",t().next);
+  $("#theme").setAttribute("aria-label",t().theme); $("#lang").setAttribute("aria-label",t().lang);
+  $("#totop").setAttribute("aria-label",t().top);
+  $("#qx").setAttribute("aria-label",t().reset);
+  [...$("#lang").children].forEach(x=>x.classList.toggle("on",x.dataset.l===LG));
+  $("#foot").textContent="World Days · "+t().foot;
+  document.documentElement.lang=LG;
+}
+
+function renderToday(){
+  const n=new Date(), y=n.getFullYear();
+  const list=build(y).filter(e=>e.m===n.getMonth()+1&&e.d===n.getDate());
+  $("#tdate").textContent=LG==="th"?`วัน${DWF.th[n.getDay()]}`:DWF.en[n.getDay()];
+  $("#ttitle").textContent=LG==="th"?`${n.getDate()} ${MN.th[n.getMonth()]} ${y+543}`:`${n.getDate()} ${MN.en[n.getMonth()]} ${y}`;
+  $("#tlab").textContent=t().today;
+  $("#tcnt").textContent=list.length?t().n(list.length):"";
+  $("#tlist").innerHTML=list.length?list.map(e=>item(e,list.length===1,y)).join(""):emptyHTML(t().none,"🗓️");
+}
+
+function renderMonthPanel(){
+  const cm=NOW0.getMonth()+1;
+  let h=`<button data-m="0" aria-pressed="${M===0}" class="${M===0?"on":""}" style="grid-column:span 4">${t().all}</button>`;
+  for(let i=1;i<=12;i++)h+=`<button data-m="${i}" aria-pressed="${M===i}" class="${M===i?"on":""}${(i===cm&&Y===NOW0.getFullYear())?" cur":""}">${MS[LG][i-1]}</button>`;
+  $("#mgrid").innerHTML=h;
+  let yh="";for(let i=2024;i<=2030;i++)yh+=`<button data-y="${i}" aria-pressed="${Y===i}" class="${Y===i?"on":""}">${yr(i)}</button>`;
+  $("#ygrid").innerHTML=yh;
+}
+
+function renderCountry(){
+  const pin=["INT","UN"];
+  const used=[...new Set(DATA.map(e=>e.c))].sort((a,b)=>{
+    const pa=pin.indexOf(a),pb=pin.indexOf(b);
+    if(pa>-1||pb>-1)return (pa<0?99:pa)-(pb<0?99:pb);
+    return cn(a).localeCompare(cn(b),LG);});
+  if(CO!=="*"&&!used.includes(CO))CO="*";
+  $("#country").innerHTML=`<option value="*">${t().allc}</option>`+used.map(c=>`<option value="${c}">${fl(c)} ${cn(c)}</option>`).join("");
+  $("#country").value=CO;
+}
+
+function renderCats(){
+  $("#cats").innerHTML=`<button data-k="*" aria-pressed="${KA==="*"}" class="${KA==="*"?"on":""}">${t().allk}</button>`+
+    Object.entries(CAT).map(([k,v])=>`<button data-k="${k}" aria-pressed="${KA===k}" class="${KA===k?"on":""}"><i class="cd" style="background:${v[2]}"></i>${v[LG==="th"?0:1]}</button>`).join("");
+}
+
+function renderToolbar(){
+  $("#mpick").innerHTML=`<span>${M===0?t().all:MN[LG][M-1]} ${yr(Y)}</span>${ICON.down}`;
+  const n=activeN();
+  $("#bfilter").innerHTML=`${ICON.filter}<span class="lbl">${t().filter}</span>${n?`<span class="bdg">${n}</span>`:""}`;
+  $("#bfilter").classList.toggle("on",n>0);
+  $("#bcal").innerHTML=`${ICON.cal}<span class="lbl">${t().cal}</span>`;
+  $("#bcal").disabled=(M===0);
+}
+
+function renderCal(){
+  if(M===0){setPanel("cal",false);return;}
+  const list=fil(DATA).filter(e=>e.m===M);
+  const dim=new Date(Y,M,0).getDate(), off=new Date(Y,M-1,1).getDay(), n=new Date();
+  $("#cwk").innerHTML=DW[LG].map(d=>`<div>${d}</div>`).join("");
+  let h="";
+  for(let i=0;i<off;i++)h+=`<span></span>`;
+  for(let d=1;d<=dim;d++){
+    const ev=list.filter(e=>e.d===d);
+    const now=n.getFullYear()===Y&&n.getMonth()+1===M&&n.getDate()===d;
+    const lab=`${d} ${MN[LG][M-1]} · ${t().n(ev.length)}`;
+    h+=`<button ${ev.length?`data-d="${d}"`:"disabled"} aria-label="${lab}" class="${ev.length?"has":""} ${now?"now":""}">${d}
+      <span class="ds">${ev.slice(0,3).map(e=>`<i style="background:${now?"currentColor":CAT[e.cat][2]}"></i>`).join("")}</span></button>`;
+  }
+  $("#cal").innerHTML=h;
+}
+
+function renderSummary(count){
+  const chip=(txt,k)=>`<span class="fchip">${txt}<button data-clear="${k}" aria-label="${t().reset}">${ICON.x}</button></span>`;
+  let h=`<span>${t().n(count)}</span>`;
+  if(CO!=="*")h+=chip(`${fl(CO)} ${cn(CO)}`,"co");
+  if(KA!=="*")h+=chip(CAT[KA][LG==="th"?0:1],"ka");
+  if(Q)h+=chip(`“${esc(QR)}”`,"q");
+  if(activeN()>1)h+=`<button class="clr" data-clear="all">${t().clearAll}</button>`;
+  $("#sum").innerHTML=h;
+}
+
+function renderMain(){
+  const list=fil(DATA).filter(e=>M===0||e.m===M);
+  renderSummary(list.length);
+  if(!list.length){$("#main").innerHTML=`<div class="card" style="margin-top:14px">${emptyHTML(t().nores,"🔍",activeN()>0)}</div>`;return;}
+  if(M!==0){$("#main").innerHTML=renderDays(list);return;}
+  const auto=activeN()>0; let h="";
+  for(let m=1;m<=12;m++){
+    const g=list.filter(e=>e.m===m); if(!g.length)continue;
+    const open=auto||OPENM.has(m);
+    h+=`<div class="mgw${open?" open":""}"><button class="mhead" data-mg="${m}" aria-expanded="${open}">
+        <span class="chev">${ICON.chev}</span><b>${MN[LG][m-1]}</b><span class="n">${t().n(g.length)}</span></button>
+        <div class="col"><div class="ci">${renderDays(g)}</div></div></div>`;
+  }
+  $("#main").innerHTML=h;
+}
+
+function renderSources(){
+  const GS=[["United Nations — International Days & Weeks","https://www.un.org/en/observances/list-days-weeks"],
+    ["UNESCO — International Days","https://www.unesco.org/en/days"],
+    ["UNESCO — Intangible Cultural Heritage Lists","https://ich.unesco.org/en/lists"],
+    ["WHO — Campaigns","https://www.who.int/campaigns"],
+    ["Wikipedia — List of national independence days","https://en.wikipedia.org/wiki/List_of_national_independence_days"],
+    ["Wikipedia — Public holidays by country","https://en.wikipedia.org/wiki/List_of_public_holidays_by_country"],
+    ["timeanddate.com — Holidays worldwide","https://www.timeanddate.com/holidays/"],
+    ["Nager.Date — Public Holiday API","https://date.nager.at/"]];
+  $("#slab").textContent=t().src;
+  $("#scnt").textContent=GS.length;
+  $("#srclist").innerHTML=GS.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${n} ↗</a>`).join("")+`<small>${t().srcnote}</small>`;
+}
+
+function render(){
+  DATA=build(Y);
+  renderStatic();renderToday();renderMonthPanel();renderCountry();renderCats();
+  renderToolbar();renderCal();renderMain();renderSources();
+  LS.set("wd-lang",LG);
+}
+const update=()=>{renderToolbar();renderCal();renderMain();};
+
+/* ---------- panels ---------- */
+const PAN={month:["#pmonth","#mpick"],filter:["#pfilter","#bfilter"],cal:["#pcal","#bcal"]};
+function setPanel(k,show){const [p,b]=PAN[k];$(p).classList.toggle("show",show);$(b).setAttribute("aria-expanded",show);}
+function togglePanel(k){
+  const open=$(PAN[k][0]).classList.contains("show");
+  if(k==="month")setPanel("filter",false);
+  if(k==="filter")setPanel("month",false);
+  setPanel(k,!open);
+}
+function toToolbar(){
+  const hh=$("#hdr").offsetHeight, r=$(".tb").getBoundingClientRect();
+  if(r.top<hh)window.scrollTo({top:window.scrollY+r.top-hh-10,behavior:"smooth"});
+}
+function setTheme(v,save){
+  document.documentElement.classList.add("tt");
+  document.documentElement.setAttribute("data-t",v);
+  const m=document.querySelector("meta[name=theme-color]"); if(m)m.content=v==="dark"?"#0c0d12":"#f6f7fb";
+  if(save)LS.set("wd-theme",v);
+  setTimeout(()=>document.documentElement.classList.remove("tt"),350);
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",ev=>{
+  const b=ev.target.closest("button"); if(!b)return;
+  if(b.dataset.l){LG=b.dataset.l;render();return;}
+  if(b.id==="theme"){setTheme(document.documentElement.getAttribute("data-t")==="dark"?"light":"dark",true);return;}
+  if(b.id==="totop"){window.scrollTo({top:0,behavior:"smooth"});return;}
+  if(b.hasAttribute("data-blk")){const o=b.parentElement.classList.toggle("open");b.setAttribute("aria-expanded",o);return;}
+  if(b.id==="mpick"){togglePanel("month");return;}
+  if(b.id==="bfilter"){togglePanel("filter");return;}
+  if(b.id==="bcal"){togglePanel("cal");return;}
+  if(b.id==="qx"){QR="";Q="";$("#q").value="";b.hidden=true;update();$("#q").focus();return;}
+  if(b.id==="prev"||b.id==="next"){const k=b.id==="prev"?-1:1;
+    if(M===0){Y=Math.min(2030,Math.max(2024,Y+k));}
+    else{M+=k;if(M>12){M=1;Y=Math.min(2030,Y+1);}if(M<1){M=12;Y=Math.max(2024,Y-1);}}
+    render();toToolbar();return;}
+  if(b.dataset.m!==undefined){M=+b.dataset.m;setPanel("month",false);render();toToolbar();return;}
+  if(b.dataset.y){Y=+b.dataset.y;render();return;}
+  if(b.dataset.k){KA=b.dataset.k;renderCats();update();return;}
+  if(b.dataset.clear){const k=b.dataset.clear;
+    if(k==="co"||k==="all")CO="*";
+    if(k==="ka"||k==="all")KA="*";
+    if(k==="q"||k==="all"){Q="";QR="";$("#q").value="";$("#qx").hidden=true;}
+    $("#country").value=CO;renderCats();update();return;}
+  if(b.dataset.mg){const w=b.parentElement,m=+b.dataset.mg;const o=w.classList.toggle("open");
+    b.setAttribute("aria-expanded",o);o?OPENM.add(m):OPENM.delete(m);return;}
+  if(b.dataset.d){const el=$(`#d-${M}-${b.dataset.d}`);
+    if(el){el.scrollIntoView({behavior:"smooth",block:"start"});
+      el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");
+      setTimeout(()=>el.classList.remove("flash"),1900);
+      const first=el.nextElementSibling&&el.nextElementSibling.querySelector(".it");
+      if(first&&!first.classList.contains("open")){first.classList.add("open");first.querySelector(".ih").setAttribute("aria-expanded","true");}}
+    return;}
+  const ih=b.closest(".ih");
+  if(ih){const it=ih.parentElement;const o=it.classList.toggle("open");ih.setAttribute("aria-expanded",o);}
+});
+
+$("#country").addEventListener("change",e=>{CO=e.target.value;update();});
+let qt;
+$("#q").addEventListener("input",e=>{
+  const v=e.target.value; $("#qx").hidden=!v;
+  clearTimeout(qt);
+  qt=setTimeout(()=>{QR=v.trim();Q=QR.toLowerCase();if(Q&&M!==0)M=0;update();},140);
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){setPanel("month",false);setPanel("filter",false);}
+});
+let tick=false;
+addEventListener("scroll",()=>{
+  if(tick)return;tick=true;
+  requestAnimationFrame(()=>{tick=false;
+    $("#hdr").classList.toggle("scrolled",scrollY>4);
+    $("#totop").classList.toggle("show",scrollY>700);});
+},{passive:true});
+
+render();
+</script>
+</body>
+</html>
